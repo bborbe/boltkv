@@ -10,10 +10,9 @@ import (
 	"path"
 
 	"github.com/bborbe/errors"
+	libkv "github.com/bborbe/kv"
 	"github.com/golang/glog"
 	bolt "go.etcd.io/bbolt"
-
-	libkv "github.com/bborbe/kv"
 )
 
 type DB interface {

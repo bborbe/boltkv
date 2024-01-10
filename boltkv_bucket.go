@@ -7,9 +7,8 @@ package boltkv
 import (
 	"context"
 
-	bolt "go.etcd.io/bbolt"
-
 	libkv "github.com/bborbe/kv"
+	bolt "go.etcd.io/bbolt"
 )
 
 func NewBucket(boltBucket *bolt.Bucket) libkv.Bucket {

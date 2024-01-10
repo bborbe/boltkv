@@ -5,9 +5,8 @@
 package boltkv
 
 import (
-	bolt "go.etcd.io/bbolt"
-
 	libkv "github.com/bborbe/kv"
+	bolt "go.etcd.io/bbolt"
 )
 
 func NewIteratorReverse(boltCursor *bolt.Cursor) libkv.Iterator {

@@ -8,9 +8,8 @@ import (
 	"context"
 
 	"github.com/bborbe/errors"
-	bolt "go.etcd.io/bbolt"
-
 	libkv "github.com/bborbe/kv"
+	bolt "go.etcd.io/bbolt"
 )
 
 func NewTx(boltTx *bolt.Tx) libkv.Tx {
