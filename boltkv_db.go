@@ -78,7 +78,8 @@ func (b *boltdb) Close() error {
 }
 
 func (b *boltdb) Update(ctx context.Context, fn func(tx libkv.Tx) error) error {
-	return b.db.Update(func(tx *bolt.Tx) error {
+	glog.V(4).Infof("db update started")
+	err := b.db.Update(func(tx *bolt.Tx) error {
 		glog.V(4).Infof("db update started")
 		if err := fn(NewTx(tx)); err != nil {
 			return errors.Wrapf(ctx, err, "db update failed")
@@ -86,10 +87,16 @@ func (b *boltdb) Update(ctx context.Context, fn func(tx libkv.Tx) error) error {
 		glog.V(4).Infof("db update completed")
 		return nil
 	})
+	if err != nil {
+		return errors.Wrapf(ctx, err, "db update failed")
+	}
+	glog.V(4).Infof("db update completed")
+	return nil
 }
 
 func (b *boltdb) View(ctx context.Context, fn func(tx libkv.Tx) error) error {
-	return b.db.View(func(tx *bolt.Tx) error {
+	glog.V(4).Infof("db view started")
+	err := b.db.View(func(tx *bolt.Tx) error {
 		glog.V(4).Infof("db view started")
 		if err := fn(NewTx(tx)); err != nil {
 			return errors.Wrapf(ctx, err, "db view failed")
@@ -97,4 +104,9 @@ func (b *boltdb) View(ctx context.Context, fn func(tx libkv.Tx) error) error {
 		glog.V(4).Infof("db view completed")
 		return nil
 	})
+	if err != nil {
+		return errors.Wrapf(ctx, err, "db view failed")
+	}
+	glog.V(4).Infof("db view completed")
+	return nil
 }
