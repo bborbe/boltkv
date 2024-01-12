@@ -4,11 +4,14 @@
 
 package kv
 
-import "io"
+import (
+	"context"
+	"io"
+)
 
 type DB interface {
-	Update(fn func(tx Tx) error) error
-	View(fn func(tx Tx) error) error
+	Update(ctx context.Context, fn func(tx Tx) error) error
+	View(ctx context.Context, fn func(tx Tx) error) error
 	io.Closer
 	Sync() error
 }

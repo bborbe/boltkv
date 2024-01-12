@@ -802,7 +802,7 @@ func (b *builder) expr0(fn *Function, e ast.Expr, tv types.TypeAndValue) Value {
 			if types.IsInterface(rt) {
 				// If v may be an interface type I (after instantiating),
 				// we must emit a check that v is non-nil.
-				if recv, ok := sel.recv.(*typeparams.TypeParam); ok {
+				if recv, ok := sel.recv.(*types.TypeParam); ok {
 					// Emit a nil check if any possible instantiation of the
 					// type parameter is an interface type.
 					if typeSetOf(recv).Len() > 0 {
@@ -848,7 +848,7 @@ func (b *builder) expr0(fn *Function, e ast.Expr, tv types.TypeAndValue) Value {
 
 		panic("unexpected expression-relative selector")
 
-	case *typeparams.IndexListExpr:
+	case *ast.IndexListExpr:
 		// f[X, Y] must be a generic function
 		if !instance(fn.info, e.X) {
 			panic("unexpected expression-could not match index list to instantiation")
@@ -932,7 +932,10 @@ func (b *builder) receiver(fn *Function, e ast.Expr, wantAddr, escaping bool, se
 	last := len(sel.index) - 1
 	// The position of implicit selection is the position of the inducing receiver expression.
 	v = emitImplicitSelections(fn, v, sel.index[:last], e.Pos())
-	if _, vptr := deref(v.Type()); !wantAddr && vptr {
+	if types.IsInterface(v.Type()) {
+		// When v is an interface, sel.Kind()==MethodValue and v.f is invoked.
+		// So v is not loaded, even if v has a pointer core type.
+	} else if _, vptr := deref(v.Type()); !wantAddr && vptr {
 		v = emitLoad(fn, v)
 	}
 	return v

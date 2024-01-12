@@ -77,14 +77,24 @@ func (b *boltdb) Close() error {
 	return b.db.Close()
 }
 
-func (b *boltdb) Update(fn func(tx libkv.Tx) error) error {
+func (b *boltdb) Update(ctx context.Context, fn func(tx libkv.Tx) error) error {
 	return b.db.Update(func(tx *bolt.Tx) error {
-		return fn(NewTx(tx))
+		glog.V(4).Infof("db update started")
+		if err := fn(NewTx(tx)); err != nil {
+			return errors.Wrapf(ctx, err, "db update failed")
+		}
+		glog.V(4).Infof("db update completed")
+		return nil
 	})
 }
 
-func (b *boltdb) View(fn func(tx libkv.Tx) error) error {
+func (b *boltdb) View(ctx context.Context, fn func(tx libkv.Tx) error) error {
 	return b.db.View(func(tx *bolt.Tx) error {
-		return fn(NewTx(tx))
+		glog.V(4).Infof("db view started")
+		if err := fn(NewTx(tx)); err != nil {
+			return errors.Wrapf(ctx, err, "db view failed")
+		}
+		glog.V(4).Infof("db view completed")
+		return nil
 	})
 }

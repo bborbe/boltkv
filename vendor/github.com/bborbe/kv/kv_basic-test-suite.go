@@ -16,7 +16,7 @@ func BasicTestSuite(ctx context.Context, db DB) {
 
 	bucketName := NewBucketName("mybucket")
 
-	err := db.Update(func(tx Tx) error {
+	err := db.Update(ctx, func(tx Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
 		Expect(err).To(BeNil())
 
