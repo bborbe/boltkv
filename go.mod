@@ -20,7 +20,7 @@ require (
 	github.com/google/pprof v0.0.0-20231229205709-960ae82b1e42 // indirect
 	github.com/incu6us/goimports-reviser v0.1.6 // indirect
 	github.com/kisielk/errcheck v1.6.3 // indirect
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0 // indirect
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.8.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/mod v0.14.0 // indirect
