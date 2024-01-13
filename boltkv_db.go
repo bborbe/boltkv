@@ -18,6 +18,7 @@ import (
 type DB interface {
 	libkv.DB
 	Bolt() *bolt.DB
+	Remove() error
 }
 
 type ChangeOptions func(opts *bolt.Options)
@@ -31,7 +32,7 @@ func OpenFile(ctx context.Context, path string, fn ...ChangeOptions) (DB, error)
 	if err != nil {
 		return nil, errors.Wrapf(ctx, err, "open %s failed", path)
 	}
-	return NewDB(db), nil
+	return NewDB(db, path), nil
 }
 
 func OpenDir(ctx context.Context, dir string, fn ...ChangeOptions) (DB, error) {
@@ -52,14 +53,16 @@ func OpenTemp(ctx context.Context, fn ...ChangeOptions) (DB, error) {
 	return OpenFile(ctx, file.Name(), fn...)
 }
 
-func NewDB(db *bolt.DB) DB {
+func NewDB(db *bolt.DB, path string) DB {
 	return &boltdb{
-		db: db,
+		db:   db,
+		path: path,
 	}
 }
 
 type boltdb struct {
-	db *bolt.DB
+	db   *bolt.DB
+	path string
 }
 
 func (b *boltdb) Bolt() *bolt.DB {
@@ -109,4 +112,8 @@ func (b *boltdb) View(ctx context.Context, fn func(tx libkv.Tx) error) error {
 	}
 	glog.V(4).Infof("db view completed")
 	return nil
+}
+
+func (b *boltdb) Remove() error {
+	return os.Remove(b.path)
 }
