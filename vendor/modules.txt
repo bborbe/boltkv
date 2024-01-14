@@ -1,7 +1,7 @@
 # github.com/bborbe/errors v1.2.0
 ## explicit; go 1.20
 github.com/bborbe/errors
-# github.com/bborbe/kv v1.1.1
+# github.com/bborbe/kv v1.2.0
 ## explicit; go 1.21.5
 github.com/bborbe/kv
 # github.com/bmatcuk/doublestar/v4 v4.6.1

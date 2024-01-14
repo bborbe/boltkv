@@ -5,6 +5,8 @@
 package boltkv
 
 import (
+	"bytes"
+
 	libkv "github.com/bborbe/kv"
 	bolt "go.etcd.io/bbolt"
 )
@@ -42,7 +44,13 @@ func (i *iteratorReverse) Rewind() {
 
 func (i *iteratorReverse) Seek(key []byte) {
 	i.key, i.value = i.boltCursor.Seek(key)
+	// key is null if seek is last key
 	if len(i.key) == 0 {
 		i.key, i.value = i.boltCursor.Last()
+		return
+	}
+	// if seek is not a exact match it key after
+	if bytes.Compare(i.key, key) > 0 {
+		i.key, i.value = i.boltCursor.Prev()
 	}
 }

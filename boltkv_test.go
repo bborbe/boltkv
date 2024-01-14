@@ -16,17 +16,21 @@ import (
 
 var _ = Describe("BoltKV", func() {
 	var ctx context.Context
-	var db libkv.DB
+	var db boltkv.DB
 	var err error
+	var provider libkv.ProviderFunc = func(ctx context.Context) (libkv.DB, error) {
+		return db, nil
+	}
 	BeforeEach(func() {
 		ctx = context.Background()
 		db, err = boltkv.OpenTemp(ctx)
 		Expect(err).To(BeNil())
+
 	})
-	It("basic", func() {
-		libkv.BasicTestSuite(ctx, db)
+	AfterEach(func() {
+		_ = db.Close()
+		_ = db.Remove()
 	})
-	It("iterator", func() {
-		libkv.IteratorTestSuite(ctx, db)
-	})
+	libkv.BasicTestSuite(ctx, provider)
+	libkv.IteratorTestSuite(ctx, provider)
 })
