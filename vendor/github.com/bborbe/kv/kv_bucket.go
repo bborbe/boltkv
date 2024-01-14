@@ -6,10 +6,7 @@ package kv
 
 import (
 	"context"
-	"errors"
 )
-
-var BucketNotFound = errors.New("bucket not found")
 
 type Bucket interface {
 	Put(ctx context.Context, key []byte, value []byte) error

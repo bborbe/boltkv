@@ -4,7 +4,13 @@
 
 package kv
 
-import "context"
+import (
+	"context"
+	"errors"
+)
+
+var BucketNotFoundError = errors.New("bucket not found")
+var BucketAlreadyExistsError = errors.New("bucket already exists")
 
 type Tx interface {
 	Bucket(ctx context.Context, name BucketName) (Bucket, error)

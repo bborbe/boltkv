@@ -25,12 +25,12 @@ var _ = Describe("BoltKV", func() {
 		ctx = context.Background()
 		db, err = boltkv.OpenTemp(ctx)
 		Expect(err).To(BeNil())
-
 	})
 	AfterEach(func() {
 		_ = db.Close()
 		_ = db.Remove()
 	})
-	libkv.BasicTestSuite(ctx, provider)
-	libkv.IteratorTestSuite(ctx, provider)
+	libkv.BucketTestSuite(provider)
+	libkv.BasicTestSuite(provider)
+	libkv.IteratorTestSuite(provider)
 })

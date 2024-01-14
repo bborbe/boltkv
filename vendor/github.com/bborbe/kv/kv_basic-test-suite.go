@@ -11,96 +11,100 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func BasicTestSuite(ctx context.Context, provider Provider) {
+func BasicTestSuite(provider Provider) {
 	GinkgoHelper()
-	var db DB
-	var err error
-	var bucketName BucketName
-	BeforeEach(func() {
-		bucketName = NewBucketName("mybucket")
-		db, err = provider.Get(ctx)
-		Expect(err).To(BeNil())
-	})
-	It("Get not found", func() {
-		err = db.Update(ctx, func(tx Tx) error {
-			bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
+	Context("Basic", func() {
+		var db DB
+		var err error
+		var bucketName BucketName
+		var ctx context.Context
+		BeforeEach(func() {
+			ctx = context.Background()
+			db, err = provider.Get(ctx)
+			Expect(db).NotTo(BeNil())
 			Expect(err).To(BeNil())
-
-			{
-				item, err := bucket.Get(ctx, []byte("key"))
-				Expect(err).To(BeNil())
-				Expect(item.Key()).To(Equal([]byte("key")))
-				var result []byte
-				err = item.Value(func(val []byte) error {
-					result = val
-					return nil
-				})
-				Expect(err).To(BeNil())
-				Expect(result).To(BeNil())
-			}
-
-			return nil
+			bucketName = NewBucketName("mybucket")
 		})
-		Expect(err).To(BeNil())
-	})
-	It("Put and Get", func() {
-		err = db.Update(ctx, func(tx Tx) error {
-			bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
+		It("Get not found", func() {
+			err = db.Update(ctx, func(tx Tx) error {
+				bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
+				Expect(err).To(BeNil())
+
+				{
+					item, err := bucket.Get(ctx, []byte("key"))
+					Expect(err).To(BeNil())
+					Expect(item.Key()).To(Equal([]byte("key")))
+					var result []byte
+					err = item.Value(func(val []byte) error {
+						result = val
+						return nil
+					})
+					Expect(err).To(BeNil())
+					Expect(result).To(BeNil())
+				}
+
+				return nil
+			})
 			Expect(err).To(BeNil())
-
-			{
-				err = bucket.Put(ctx, []byte("key"), []byte("value"))
-				Expect(err).To(BeNil())
-			}
-
-			{
-				item, err := bucket.Get(ctx, []byte("key"))
-				Expect(err).To(BeNil())
-				Expect(item.Key()).To(Equal([]byte("key")))
-				var result []byte
-				err = item.Value(func(val []byte) error {
-					result = val
-					return nil
-				})
-				Expect(err).To(BeNil())
-				Expect(result).To(Equal([]byte("value")))
-			}
-
-			return nil
 		})
-		Expect(err).To(BeNil())
-	})
-	It("Put, Delete and Get", func() {
-		err = db.Update(ctx, func(tx Tx) error {
-			bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
+		It("Put and Get", func() {
+			err = db.Update(ctx, func(tx Tx) error {
+				bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
+				Expect(err).To(BeNil())
+
+				{
+					err = bucket.Put(ctx, []byte("key"), []byte("value"))
+					Expect(err).To(BeNil())
+				}
+
+				{
+					item, err := bucket.Get(ctx, []byte("key"))
+					Expect(err).To(BeNil())
+					Expect(item.Key()).To(Equal([]byte("key")))
+					var result []byte
+					err = item.Value(func(val []byte) error {
+						result = val
+						return nil
+					})
+					Expect(err).To(BeNil())
+					Expect(result).To(Equal([]byte("value")))
+				}
+
+				return nil
+			})
 			Expect(err).To(BeNil())
-
-			{
-				err = bucket.Put(ctx, []byte("key"), []byte("value"))
-				Expect(err).To(BeNil())
-			}
-
-			{
-				err = bucket.Delete(ctx, []byte("key"))
-				Expect(err).To(BeNil())
-			}
-
-			{
-				item, err := bucket.Get(ctx, []byte("key"))
-				Expect(err).To(BeNil())
-				Expect(item.Key()).To(Equal([]byte("key")))
-				var result []byte
-				err = item.Value(func(val []byte) error {
-					result = val
-					return nil
-				})
-				Expect(err).To(BeNil())
-				Expect(result).To(BeNil())
-			}
-
-			return nil
 		})
+		It("Put, Delete and Get", func() {
+			err = db.Update(ctx, func(tx Tx) error {
+				bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
+				Expect(err).To(BeNil())
 
-		Expect(err).To(BeNil())
+				{
+					err = bucket.Put(ctx, []byte("key"), []byte("value"))
+					Expect(err).To(BeNil())
+				}
+
+				{
+					err = bucket.Delete(ctx, []byte("key"))
+					Expect(err).To(BeNil())
+				}
+
+				{
+					item, err := bucket.Get(ctx, []byte("key"))
+					Expect(err).To(BeNil())
+					Expect(item.Key()).To(Equal([]byte("key")))
+					var result []byte
+					err = item.Value(func(val []byte) error {
+						result = val
+						return nil
+					})
+					Expect(err).To(BeNil())
+					Expect(result).To(BeNil())
+				}
+
+				return nil
+			})
+			Expect(err).To(BeNil())
+		})
 	})
 }
