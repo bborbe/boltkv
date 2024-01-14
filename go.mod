@@ -4,7 +4,7 @@ go 1.21.5
 
 require (
 	github.com/bborbe/errors v1.2.0
-	github.com/bborbe/kv v1.1.0
+	github.com/bborbe/kv v1.1.1
 	github.com/golang/glog v1.2.0
 	github.com/onsi/ginkgo/v2 v2.14.0
 	github.com/onsi/gomega v1.30.0

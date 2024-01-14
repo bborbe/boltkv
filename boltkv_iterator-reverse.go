@@ -42,4 +42,7 @@ func (i *iteratorReverse) Rewind() {
 
 func (i *iteratorReverse) Seek(key []byte) {
 	i.key, i.value = i.boltCursor.Seek(key)
+	if len(i.key) == 0 {
+		i.key, i.value = i.boltCursor.Last()
+	}
 }
