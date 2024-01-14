@@ -26,16 +26,33 @@ func IteratorTestSuite(provider Provider) {
 			bucketName = NewBucketName("mybucket")
 
 			err := db.Update(ctx, func(tx Tx) error {
-				bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
-				Expect(err).To(BeNil())
-
 				{
-					err = bucket.Put(ctx, []byte("dk"), []byte("dv"))
+					bucket, err := tx.CreateBucketIfNotExists(ctx, NewBucketName("aaaa"))
 					Expect(err).To(BeNil())
+					{
+						err = bucket.Put(ctx, []byte("dk"), []byte("dv"))
+						Expect(err).To(BeNil())
+					}
 				}
 				{
-					err = bucket.Put(ctx, []byte("bk"), []byte("bv"))
+					bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
 					Expect(err).To(BeNil())
+					{
+						err = bucket.Put(ctx, []byte("dk"), []byte("dv"))
+						Expect(err).To(BeNil())
+					}
+					{
+						err = bucket.Put(ctx, []byte("bk"), []byte("bv"))
+						Expect(err).To(BeNil())
+					}
+				}
+				{
+					bucket, err := tx.CreateBucketIfNotExists(ctx, NewBucketName("zzzz"))
+					Expect(err).To(BeNil())
+					{
+						err = bucket.Put(ctx, []byte("dk"), []byte("dv"))
+						Expect(err).To(BeNil())
+					}
 				}
 				return nil
 			})
