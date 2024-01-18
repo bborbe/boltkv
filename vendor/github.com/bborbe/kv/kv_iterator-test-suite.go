@@ -25,7 +25,7 @@ func IteratorTestSuite(provider Provider) {
 			Expect(err).To(BeNil())
 			bucketName = NewBucketName("mybucket")
 
-			err := db.Update(ctx, func(tx Tx) error {
+			err := db.Update(ctx, func(ctx context.Context, tx Tx) error {
 				{
 					bucket, err := tx.CreateBucketIfNotExists(ctx, NewBucketName("aaaa"))
 					Expect(err).To(BeNil())
@@ -60,7 +60,7 @@ func IteratorTestSuite(provider Provider) {
 		})
 		Context("Iterator", func() {
 			It("Rewind", func() {
-				err := db.Update(ctx, func(tx Tx) error {
+				err := db.Update(ctx, func(ctx context.Context, tx Tx) error {
 					bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
 					Expect(err).To(BeNil())
 
@@ -88,7 +88,7 @@ func IteratorTestSuite(provider Provider) {
 				Expect(err).To(BeNil())
 			})
 			It("Seek before", func() {
-				err := db.Update(ctx, func(tx Tx) error {
+				err := db.Update(ctx, func(ctx context.Context, tx Tx) error {
 					bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
 					Expect(err).To(BeNil())
 
@@ -116,7 +116,7 @@ func IteratorTestSuite(provider Provider) {
 				Expect(err).To(BeNil())
 			})
 			It("Seek at", func() {
-				err := db.Update(ctx, func(tx Tx) error {
+				err := db.Update(ctx, func(ctx context.Context, tx Tx) error {
 					bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
 					Expect(err).To(BeNil())
 
@@ -144,7 +144,7 @@ func IteratorTestSuite(provider Provider) {
 				Expect(err).To(BeNil())
 			})
 			It("Seek between", func() {
-				err := db.Update(ctx, func(tx Tx) error {
+				err := db.Update(ctx, func(ctx context.Context, tx Tx) error {
 					bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
 					Expect(err).To(BeNil())
 
@@ -170,7 +170,7 @@ func IteratorTestSuite(provider Provider) {
 				Expect(err).To(BeNil())
 			})
 			It("Seek after", func() {
-				err := db.Update(ctx, func(tx Tx) error {
+				err := db.Update(ctx, func(ctx context.Context, tx Tx) error {
 					bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
 					Expect(err).To(BeNil())
 
@@ -195,7 +195,7 @@ func IteratorTestSuite(provider Provider) {
 		})
 		Context("ReverseIterator", func() {
 			It("Rewind", func() {
-				err := db.Update(ctx, func(tx Tx) error {
+				err := db.Update(ctx, func(ctx context.Context, tx Tx) error {
 					bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
 					Expect(err).To(BeNil())
 
@@ -223,7 +223,7 @@ func IteratorTestSuite(provider Provider) {
 				Expect(err).To(BeNil())
 			})
 			It("Seek before", func() {
-				err := db.Update(ctx, func(tx Tx) error {
+				err := db.Update(ctx, func(ctx context.Context, tx Tx) error {
 					bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
 					Expect(err).To(BeNil())
 
@@ -251,7 +251,7 @@ func IteratorTestSuite(provider Provider) {
 				Expect(err).To(BeNil())
 			})
 			It("Seek at", func() {
-				err := db.Update(ctx, func(tx Tx) error {
+				err := db.Update(ctx, func(ctx context.Context, tx Tx) error {
 					bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
 					Expect(err).To(BeNil())
 
@@ -279,7 +279,7 @@ func IteratorTestSuite(provider Provider) {
 				Expect(err).To(BeNil())
 			})
 			It("Seek between", func() {
-				err := db.Update(ctx, func(tx Tx) error {
+				err := db.Update(ctx, func(ctx context.Context, tx Tx) error {
 					bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
 					Expect(err).To(BeNil())
 
@@ -305,7 +305,7 @@ func IteratorTestSuite(provider Provider) {
 				Expect(err).To(BeNil())
 			})
 			It("Seek after", func() {
-				err := db.Update(ctx, func(tx Tx) error {
+				err := db.Update(ctx, func(ctx context.Context, tx Tx) error {
 					bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
 					Expect(err).To(BeNil())
 

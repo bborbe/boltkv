@@ -15,6 +15,10 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
+type contextKey string
+
+const stateCtxKey contextKey = "state"
+
 type DB interface {
 	libkv.DB
 	Bolt() *bolt.DB
@@ -80,11 +84,15 @@ func (b *boltdb) Close() error {
 	return b.db.Close()
 }
 
-func (b *boltdb) Update(ctx context.Context, fn func(tx libkv.Tx) error) error {
+func (b *boltdb) Update(ctx context.Context, fn func(ctx context.Context, tx libkv.Tx) error) error {
 	glog.V(4).Infof("db update started")
+	if IsTransactionOpen(ctx) {
+		return errors.Wrapf(ctx, libkv.TransactionAlreadyOpenError, "transaction already open")
+	}
 	err := b.db.Update(func(tx *bolt.Tx) error {
 		glog.V(4).Infof("db update started")
-		if err := fn(NewTx(tx)); err != nil {
+		ctx = SetOpenState(ctx)
+		if err := fn(ctx, NewTx(tx)); err != nil {
 			return errors.Wrapf(ctx, err, "db update failed")
 		}
 		glog.V(4).Infof("db update completed")
@@ -97,11 +105,15 @@ func (b *boltdb) Update(ctx context.Context, fn func(tx libkv.Tx) error) error {
 	return nil
 }
 
-func (b *boltdb) View(ctx context.Context, fn func(tx libkv.Tx) error) error {
+func (b *boltdb) View(ctx context.Context, fn func(ctx context.Context, tx libkv.Tx) error) error {
 	glog.V(4).Infof("db view started")
+	if IsTransactionOpen(ctx) {
+		return errors.Wrapf(ctx, libkv.TransactionAlreadyOpenError, "transaction already open")
+	}
 	err := b.db.View(func(tx *bolt.Tx) error {
 		glog.V(4).Infof("db view started")
-		if err := fn(NewTx(tx)); err != nil {
+		ctx = SetOpenState(ctx)
+		if err := fn(ctx, NewTx(tx)); err != nil {
 			return errors.Wrapf(ctx, err, "db view failed")
 		}
 		glog.V(4).Infof("db view completed")
@@ -116,4 +128,12 @@ func (b *boltdb) View(ctx context.Context, fn func(tx libkv.Tx) error) error {
 
 func (b *boltdb) Remove() error {
 	return os.Remove(b.path)
+}
+
+func IsTransactionOpen(ctx context.Context) bool {
+	return ctx.Value(stateCtxKey) != nil
+}
+
+func SetOpenState(ctx context.Context) context.Context {
+	return context.WithValue(ctx, stateCtxKey, "open")
 }

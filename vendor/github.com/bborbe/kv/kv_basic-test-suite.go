@@ -6,6 +6,7 @@ package kv
 
 import (
 	"context"
+	"errors"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -26,7 +27,7 @@ func BasicTestSuite(provider Provider) {
 			bucketName = NewBucketName("mybucket")
 		})
 		It("Get not found", func() {
-			err = db.Update(ctx, func(tx Tx) error {
+			err = db.Update(ctx, func(ctx context.Context, tx Tx) error {
 				bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
 				Expect(err).To(BeNil())
 
@@ -48,7 +49,7 @@ func BasicTestSuite(provider Provider) {
 			Expect(err).To(BeNil())
 		})
 		It("Put and Get", func() {
-			err = db.Update(ctx, func(tx Tx) error {
+			err = db.Update(ctx, func(ctx context.Context, tx Tx) error {
 				bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
 				Expect(err).To(BeNil())
 
@@ -75,7 +76,7 @@ func BasicTestSuite(provider Provider) {
 			Expect(err).To(BeNil())
 		})
 		It("Put, Delete and Get", func() {
-			err = db.Update(ctx, func(tx Tx) error {
+			err = db.Update(ctx, func(ctx context.Context, tx Tx) error {
 				bucket, err := tx.CreateBucketIfNotExists(ctx, bucketName)
 				Expect(err).To(BeNil())
 
@@ -105,6 +106,15 @@ func BasicTestSuite(provider Provider) {
 				return nil
 			})
 			Expect(err).To(BeNil())
+		})
+		It("tx in tx return error", func() {
+			err = db.Update(ctx, func(ctx context.Context, tx Tx) error {
+				return db.Update(ctx, func(ctx context.Context, tx Tx) error {
+					return nil
+				})
+			})
+			Expect(err).NotTo(BeNil())
+			Expect(errors.Is(err, TransactionAlreadyOpenError)).To(BeTrue())
 		})
 	})
 }

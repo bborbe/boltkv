@@ -29,7 +29,7 @@ func BucketTestSuite(provider Provider) {
 		Context("CreateBucket", func() {
 			var bucket Bucket
 			JustBeforeEach(func() {
-				err = db.Update(ctx, func(tx Tx) error {
+				err = db.Update(ctx, func(ctx context.Context, tx Tx) error {
 					bucket, err = tx.CreateBucket(ctx, bucketName)
 					return err
 				})
@@ -44,7 +44,7 @@ func BucketTestSuite(provider Provider) {
 			})
 			Context("twise", func() {
 				BeforeEach(func() {
-					Expect(db.Update(ctx, func(tx Tx) error {
+					Expect(db.Update(ctx, func(ctx context.Context, tx Tx) error {
 						_, err = tx.CreateBucket(ctx, bucketName)
 						return err
 					})).To(BeNil())
@@ -61,7 +61,7 @@ func BucketTestSuite(provider Provider) {
 		Context("CreateBucketIfNotExists", func() {
 			var bucket Bucket
 			JustBeforeEach(func() {
-				err = db.Update(ctx, func(tx Tx) error {
+				err = db.Update(ctx, func(ctx context.Context, tx Tx) error {
 					bucket, err = tx.CreateBucketIfNotExists(ctx, bucketName)
 					return err
 				})
@@ -76,7 +76,7 @@ func BucketTestSuite(provider Provider) {
 			})
 			Context("twise", func() {
 				BeforeEach(func() {
-					Expect(db.Update(ctx, func(tx Tx) error {
+					Expect(db.Update(ctx, func(ctx context.Context, tx Tx) error {
 						_, err = tx.CreateBucketIfNotExists(ctx, bucketName)
 						return err
 					})).To(BeNil())
@@ -92,14 +92,14 @@ func BucketTestSuite(provider Provider) {
 		Context("Bucket", func() {
 			var bucket Bucket
 			JustBeforeEach(func() {
-				err = db.Update(ctx, func(tx Tx) error {
+				err = db.Update(ctx, func(ctx context.Context, tx Tx) error {
 					bucket, err = tx.Bucket(ctx, bucketName)
 					return err
 				})
 			})
 			Context("success", func() {
 				BeforeEach(func() {
-					Expect(db.Update(ctx, func(tx Tx) error {
+					Expect(db.Update(ctx, func(ctx context.Context, tx Tx) error {
 						_, err = tx.CreateBucket(ctx, bucketName)
 						return err
 					})).To(BeNil())
@@ -123,13 +123,13 @@ func BucketTestSuite(provider Provider) {
 		})
 		Context("DeleteBucket", func() {
 			JustBeforeEach(func() {
-				err = db.Update(ctx, func(tx Tx) error {
+				err = db.Update(ctx, func(ctx context.Context, tx Tx) error {
 					return tx.DeleteBucket(ctx, bucketName)
 				})
 			})
 			Context("success", func() {
 				BeforeEach(func() {
-					Expect(db.Update(ctx, func(tx Tx) error {
+					Expect(db.Update(ctx, func(ctx context.Context, tx Tx) error {
 						_, err = tx.CreateBucket(ctx, bucketName)
 						return err
 					})).To(BeNil())

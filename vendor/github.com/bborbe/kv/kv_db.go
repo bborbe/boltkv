@@ -6,12 +6,15 @@ package kv
 
 import (
 	"context"
+	"errors"
 	"io"
 )
 
+var TransactionAlreadyOpenError = errors.New("transaction already open")
+
 type DB interface {
-	Update(ctx context.Context, fn func(tx Tx) error) error
-	View(ctx context.Context, fn func(tx Tx) error) error
+	Update(ctx context.Context, fn func(ctx context.Context, tx Tx) error) error
+	View(ctx context.Context, fn func(ctx context.Context, tx Tx) error) error
 	io.Closer
 	Sync() error
 }
