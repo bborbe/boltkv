@@ -69,7 +69,14 @@ type Progress struct {
 	Message string `json:"message,omitempty"`
 }
 
-// Vuln represents a single OSV entry.
+// Finding contains information on a discovered vulnerability. Each vulnerability
+// will likely have multiple findings in JSON mode. This is because govulncheck
+// emits findings as it does work, and therefore could emit one module level,
+// one package level, and potentially multiple symbol level findings depending
+// on scan level.
+// Multiple symbol level findings can be emitted when multiple symbols of the
+// same vuln are called or govulncheck decides to show multiple traces for the
+// same symbol.
 type Finding struct {
 	// OSV is the id of the detected vulnerability.
 	OSV string `json:"osv,omitempty"`
@@ -148,11 +155,15 @@ type Position struct {
 type ScanLevel string
 
 const (
-	scanLevelModule  = "module"
-	scanLevelPackage = "package"
-	scanLevelSymbol  = "symbol"
+	ScanLevelModule  = "module"
+	ScanLevelPackage = "package"
+	ScanLevelSymbol  = "symbol"
 )
 
 // WantSymbols can be used to check whether the scan level is one that is able
 // to generate symbols called findings.
-func (l ScanLevel) WantSymbols() bool { return l == scanLevelSymbol }
+func (l ScanLevel) WantSymbols() bool { return l == ScanLevelSymbol }
+
+// WantPackages can be used to check whether the scan level is one that is able
+// to generate package
+func (l ScanLevel) WantPackages() bool { return l == ScanLevelPackage || l == ScanLevelSymbol }

@@ -4,6 +4,7 @@
 
 package kv
 
+//counterfeiter:generate -o mocks/item.go --fake-name Item . Item
 type Item interface {
 	Exists() bool
 	Key() []byte

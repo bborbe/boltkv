@@ -8,6 +8,7 @@ import (
 	"context"
 )
 
+//counterfeiter:generate -o mocks/bucket.go --fake-name Bucket . Bucket
 type Bucket interface {
 	Put(ctx context.Context, key []byte, value []byte) error
 	Get(ctx context.Context, bytes []byte) (Item, error)

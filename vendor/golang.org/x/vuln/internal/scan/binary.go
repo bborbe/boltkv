@@ -10,85 +10,60 @@ package scan
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
-	"strings"
-	"unicode"
+	"runtime/debug"
 
+	"golang.org/x/vuln/internal/buildinfo"
 	"golang.org/x/vuln/internal/client"
+	"golang.org/x/vuln/internal/derrors"
 	"golang.org/x/vuln/internal/govulncheck"
 	"golang.org/x/vuln/internal/vulncheck"
 )
 
 // runBinary detects presence of vulnerable symbols in an executable.
-func runBinary(ctx context.Context, handler govulncheck.Handler, cfg *config, client *client.Client) error {
-	var exe *os.File
+func runBinary(ctx context.Context, handler govulncheck.Handler, cfg *config, client *client.Client) (err error) {
+	defer derrors.Wrap(&err, "govulncheck")
+
 	exe, err := os.Open(cfg.patterns[0])
 	if err != nil {
 		return err
 	}
 	defer exe.Close()
 
+	bin, err := createBin(exe)
+	if err != nil {
+		return err
+	}
+
 	p := &govulncheck.Progress{Message: binaryProgressMessage}
 	if err := handler.Progress(p); err != nil {
 		return err
 	}
-	vr, err := vulncheck.Binary(ctx, exe, &cfg.Config, client)
+	return vulncheck.Binary(ctx, handler, bin, &cfg.Config, client)
+}
+
+func createBin(exe io.ReaderAt) (*vulncheck.Bin, error) {
+	mods, packageSymbols, bi, err := buildinfo.ExtractPackagesAndSymbols(exe)
 	if err != nil {
-		return fmt.Errorf("govulncheck: %v", err)
+		return nil, fmt.Errorf("could not parse provided binary: %v", err)
 	}
-	callstacks := binaryCallstacks(vr)
-	return emitResult(handler, vr, callstacks)
+	return &vulncheck.Bin{
+		Modules:    mods,
+		PkgSymbols: packageSymbols,
+		GoVersion:  bi.GoVersion,
+		GOOS:       findSetting("GOOS", bi),
+		GOARCH:     findSetting("GOARCH", bi),
+	}, nil
 }
 
-func binaryCallstacks(vr *vulncheck.Result) map[*vulncheck.Vuln]vulncheck.CallStack {
-	callstacks := map[*vulncheck.Vuln]vulncheck.CallStack{}
-	for _, vv := range uniqueVulns(vr.Vulns) {
-		f := &vulncheck.FuncNode{Package: vv.ImportSink, Name: vv.Symbol}
-		parts := strings.Split(vv.Symbol, ".")
-		if len(parts) != 1 {
-			f.RecvType = parts[0]
-			f.Name = parts[1]
-		}
-		callstacks[vv] = vulncheck.CallStack{vulncheck.StackEntry{Function: f}}
-	}
-	return callstacks
-}
-
-// uniqueVulns does for binary mode what uniqueCallStack does for source mode.
-// It tries not to report redundant symbols. Since there are no call stacks in
-// binary mode, the following approximate approach is used. Do not report unexported
-// symbols for a <vulnID, pkg, module> triple if there are some exported symbols.
-// Otherwise, report all unexported symbols to avoid not reporting anything.
-func uniqueVulns(vulns []*vulncheck.Vuln) []*vulncheck.Vuln {
-	type key struct {
-		id  string
-		pkg string
-		mod string
-	}
-	hasExported := make(map[key]bool)
-	for _, v := range vulns {
-		if isExported(v.Symbol) {
-			k := key{id: v.OSV.ID, pkg: v.ImportSink.PkgPath, mod: v.ImportSink.Module.Path}
-			hasExported[k] = true
+// findSetting returns value of setting from bi if present.
+// Otherwise, returns "".
+func findSetting(setting string, bi *debug.BuildInfo) string {
+	for _, s := range bi.Settings {
+		if s.Key == setting {
+			return s.Value
 		}
 	}
-
-	var uniques []*vulncheck.Vuln
-	for _, v := range vulns {
-		k := key{id: v.OSV.ID, pkg: v.ImportSink.PkgPath, mod: v.ImportSink.Module.Path}
-		if isExported(v.Symbol) || !hasExported[k] {
-			uniques = append(uniques, v)
-		}
-	}
-	return uniques
-}
-
-// isExported checks if the symbol is exported. Assumes that the
-// symbol is of the form "identifier" or "identifier1.identifier2".
-func isExported(symbol string) bool {
-	parts := strings.Split(symbol, ".")
-	if len(parts) == 1 {
-		return unicode.IsUpper(rune(symbol[0]))
-	}
-	return unicode.IsUpper(rune(parts[1][0]))
+	return ""
 }

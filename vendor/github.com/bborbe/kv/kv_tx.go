@@ -12,6 +12,7 @@ import (
 var BucketNotFoundError = errors.New("bucket not found")
 var BucketAlreadyExistsError = errors.New("bucket already exists")
 
+//counterfeiter:generate -o mocks/tx.go --fake-name Tx . Tx
 type Tx interface {
 	Bucket(ctx context.Context, name BucketName) (Bucket, error)
 	CreateBucket(ctx context.Context, name BucketName) (Bucket, error)

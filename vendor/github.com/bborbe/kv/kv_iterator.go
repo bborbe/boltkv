@@ -4,6 +4,7 @@
 
 package kv
 
+//counterfeiter:generate -o mocks/iterator.go --fake-name Iterator . Iterator
 type Iterator interface {
 	Close()
 	Item() Item

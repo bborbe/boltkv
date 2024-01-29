@@ -6,6 +6,7 @@ package kv
 
 import "context"
 
+//counterfeiter:generate -o mocks/provider.go --fake-name Provider . Provider
 type Provider interface {
 	Get(ctx context.Context) (DB, error)
 }

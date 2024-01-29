@@ -12,6 +12,7 @@ import (
 
 var TransactionAlreadyOpenError = errors.New("transaction already open")
 
+//counterfeiter:generate -o mocks/db.go --fake-name DB . DB
 type DB interface {
 	Update(ctx context.Context, fn func(ctx context.Context, tx Tx) error) error
 	View(ctx context.Context, fn func(ctx context.Context, tx Tx) error) error

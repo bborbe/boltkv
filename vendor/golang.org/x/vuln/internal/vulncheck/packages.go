@@ -5,7 +5,11 @@
 package vulncheck
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"os/exec"
 	"strings"
 
 	"golang.org/x/tools/go/packages"
@@ -30,6 +34,33 @@ func NewPackageGraph(goVersion string) *PackageGraph {
 		Version: semver.GoTagToSemver(goVersion),
 	})
 	return graph
+}
+
+func (g *PackageGraph) LoadModules(cfg *packages.Config) (mods []*packages.Module, err error) {
+	cmd := exec.Command("go", "list", "-m", "-json", "-mod=mod", "all")
+	cmd.Env = append(cmd.Env, cfg.Env...)
+	cmd.Dir = cfg.Dir
+	out, err := cmd.Output()
+	if err != nil {
+		if ee := (*exec.ExitError)(nil); errors.As(err, &ee) && len(ee.Stderr) > 0 {
+			return nil, fmt.Errorf("%v: %v\n%s", cmd, err, ee.Stderr)
+		}
+		return nil, fmt.Errorf("%v: %v", cmd, err)
+	}
+
+	dec := json.NewDecoder(bytes.NewReader(out))
+	for dec.More() {
+		var m *packages.Module
+		err = dec.Decode(&m)
+		if err != nil {
+			if err != nil {
+				return nil, fmt.Errorf("decoding output of %v: %v", cmd, err)
+			}
+		}
+		mods = append(mods, m)
+	}
+	g.AddModules(mods...)
+	return mods, nil
 }
 
 // AddModules adds the modules and any replace modules provided.

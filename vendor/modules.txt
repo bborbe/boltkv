@@ -1,7 +1,7 @@
 # github.com/bborbe/errors v1.2.0
 ## explicit; go 1.20
 github.com/bborbe/errors
-# github.com/bborbe/kv v1.4.0
+# github.com/bborbe/kv v1.4.1
 ## explicit; go 1.21.5
 github.com/bborbe/kv
 # github.com/bmatcuk/doublestar/v4 v4.6.1
@@ -29,7 +29,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/pprof v0.0.0-20231229205709-960ae82b1e42
+# github.com/google/pprof v0.0.0-20240117000934-35fc243c5815
 ## explicit; go 1.19
 github.com/google/pprof/profile
 # github.com/incu6us/goimports-reviser v0.1.6
@@ -48,8 +48,8 @@ github.com/maxbrunsfeld/counterfeiter/v6
 github.com/maxbrunsfeld/counterfeiter/v6/arguments
 github.com/maxbrunsfeld/counterfeiter/v6/command
 github.com/maxbrunsfeld/counterfeiter/v6/generator
-# github.com/onsi/ginkgo/v2 v2.14.0
-## explicit; go 1.18
+# github.com/onsi/ginkgo/v2 v2.15.0
+## explicit; go 1.20
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
 github.com/onsi/ginkgo/v2/formatter
@@ -70,8 +70,8 @@ github.com/onsi/ginkgo/v2/internal/parallel_support
 github.com/onsi/ginkgo/v2/internal/testingtproxy
 github.com/onsi/ginkgo/v2/reporters
 github.com/onsi/ginkgo/v2/types
-# github.com/onsi/gomega v1.30.0
-## explicit; go 1.18
+# github.com/onsi/gomega v1.31.1
+## explicit; go 1.20
 github.com/onsi/gomega
 github.com/onsi/gomega/format
 github.com/onsi/gomega/internal
@@ -167,19 +167,19 @@ golang.org/x/tools/internal/tokeninternal
 golang.org/x/tools/internal/typeparams
 golang.org/x/tools/internal/typesinternal
 golang.org/x/tools/internal/versions
-# golang.org/x/vuln v1.0.1
+# golang.org/x/vuln v1.0.2
 ## explicit; go 1.18
 golang.org/x/vuln/cmd/govulncheck
 golang.org/x/vuln/internal
+golang.org/x/vuln/internal/buildinfo
 golang.org/x/vuln/internal/client
 golang.org/x/vuln/internal/derrors
+golang.org/x/vuln/internal/gosym
 golang.org/x/vuln/internal/govulncheck
 golang.org/x/vuln/internal/osv
 golang.org/x/vuln/internal/scan
 golang.org/x/vuln/internal/semver
 golang.org/x/vuln/internal/vulncheck
-golang.org/x/vuln/internal/vulncheck/internal/buildinfo
-golang.org/x/vuln/internal/vulncheck/internal/gosym
 golang.org/x/vuln/internal/web
 golang.org/x/vuln/scan
 # gopkg.in/yaml.v3 v3.0.1
