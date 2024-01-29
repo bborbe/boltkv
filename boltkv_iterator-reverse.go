@@ -11,7 +11,7 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
-func NewIteratorReverse(boltCursor *bolt.Cursor) libkv.Iterator {
+func NewIteratorReverse(boltCursor *bolt.Cursor) Iterator {
 	return &iteratorReverse{
 		boltCursor: boltCursor,
 	}
@@ -21,6 +21,10 @@ type iteratorReverse struct {
 	boltCursor *bolt.Cursor
 	key        []byte
 	value      []byte
+}
+
+func (i *iteratorReverse) Cursor() *bolt.Cursor {
+	return i.boltCursor
 }
 
 func (i *iteratorReverse) Close() {

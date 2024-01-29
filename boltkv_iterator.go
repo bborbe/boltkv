@@ -9,7 +9,12 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
-func NewIterator(boltCursor *bolt.Cursor) libkv.Iterator {
+type Iterator interface {
+	libkv.Iterator
+	Cursor() *bolt.Cursor
+}
+
+func NewIterator(boltCursor *bolt.Cursor) Iterator {
 	return &iterator{
 		boltCursor: boltCursor,
 	}
@@ -19,6 +24,10 @@ type iterator struct {
 	boltCursor *bolt.Cursor
 	key        []byte
 	value      []byte
+}
+
+func (i *iterator) Cursor() *bolt.Cursor {
+	return i.boltCursor
 }
 
 func (i *iterator) Close() {

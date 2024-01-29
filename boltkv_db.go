@@ -21,7 +21,7 @@ const stateCtxKey contextKey = "state"
 
 type DB interface {
 	libkv.DB
-	Bolt() *bolt.DB
+	DB() *bolt.DB
 	Remove() error
 }
 
@@ -69,7 +69,7 @@ type boltdb struct {
 	path string
 }
 
-func (b *boltdb) Bolt() *bolt.DB {
+func (b *boltdb) DB() *bolt.DB {
 	return b.db
 }
 

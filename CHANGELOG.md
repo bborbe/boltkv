@@ -8,6 +8,10 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.5.1
+
+- add interface to access bolt db, tx, bucket if needed
+
 ## v1.5.0
 
 - prevent transaction open second transaction
@@ -23,7 +27,7 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 ## v1.3.0
 
 - use new testsuite
-- fix reverse seek 
+- fix reverse seek
 
 ## v1.2.1
 

@@ -11,7 +11,12 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
-func NewBucket(boltBucket *bolt.Bucket) libkv.Bucket {
+type Bucket interface {
+	libkv.Bucket
+	Bucket() *bolt.Bucket
+}
+
+func NewBucket(boltBucket *bolt.Bucket) Bucket {
 	return &bucket{
 		boltBucket: boltBucket,
 	}
@@ -19,6 +24,10 @@ func NewBucket(boltBucket *bolt.Bucket) libkv.Bucket {
 
 type bucket struct {
 	boltBucket *bolt.Bucket
+}
+
+func (b *bucket) Bucket() *bolt.Bucket {
+	return b.boltBucket
 }
 
 func (b *bucket) IteratorReverse() libkv.Iterator {

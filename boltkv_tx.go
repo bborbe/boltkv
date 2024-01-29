@@ -12,7 +12,12 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
-func NewTx(boltTx *bolt.Tx) libkv.Tx {
+type Tx interface {
+	libkv.Tx
+	Tx() *bolt.Tx
+}
+
+func NewTx(boltTx *bolt.Tx) Tx {
 	return &tx{
 		boltTx: boltTx,
 	}
@@ -20,6 +25,10 @@ func NewTx(boltTx *bolt.Tx) libkv.Tx {
 
 type tx struct {
 	boltTx *bolt.Tx
+}
+
+func (t *tx) Tx() *bolt.Tx {
+	return t.Tx()
 }
 
 func (t *tx) Bucket(ctx context.Context, name libkv.BucketName) (libkv.Bucket, error) {

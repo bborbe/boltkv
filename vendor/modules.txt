@@ -29,7 +29,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/pprof v0.0.0-20240117000934-35fc243c5815
+# github.com/google/pprof v0.0.0-20240125082051-42cd04596328
 ## explicit; go 1.19
 github.com/google/pprof/profile
 # github.com/incu6us/goimports-reviser v0.1.6
@@ -167,7 +167,7 @@ golang.org/x/tools/internal/tokeninternal
 golang.org/x/tools/internal/typeparams
 golang.org/x/tools/internal/typesinternal
 golang.org/x/tools/internal/versions
-# golang.org/x/vuln v1.0.2
+# golang.org/x/vuln v1.0.3
 ## explicit; go 1.18
 golang.org/x/vuln/cmd/govulncheck
 golang.org/x/vuln/internal
