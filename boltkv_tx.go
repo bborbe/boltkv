@@ -28,7 +28,7 @@ type tx struct {
 }
 
 func (t *tx) Tx() *bolt.Tx {
-	return t.Tx()
+	return t.boltTx
 }
 
 func (t *tx) Bucket(ctx context.Context, name libkv.BucketName) (libkv.Bucket, error) {
