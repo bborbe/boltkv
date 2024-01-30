@@ -36,7 +36,7 @@ func OpenFile(ctx context.Context, path string, fn ...ChangeOptions) (DB, error)
 	if err != nil {
 		return nil, errors.Wrapf(ctx, err, "open %s failed", path)
 	}
-	return NewDB(db, path), nil
+	return NewDB(db), nil
 }
 
 func OpenDir(ctx context.Context, dir string, fn ...ChangeOptions) (DB, error) {
@@ -57,10 +57,10 @@ func OpenTemp(ctx context.Context, fn ...ChangeOptions) (DB, error) {
 	return OpenFile(ctx, file.Name(), fn...)
 }
 
-func NewDB(db *bolt.DB, path string) DB {
+func NewDB(db *bolt.DB) DB {
 	return &boltdb{
 		db:   db,
-		path: path,
+		path: db.Path(),
 	}
 }
 

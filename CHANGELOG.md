@@ -8,6 +8,10 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.6.0
+
+- remove path from NewDB
+
 ## v1.5.1
 
 - add interface to access bolt db, tx, bucket if needed
