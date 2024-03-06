@@ -6,7 +6,11 @@ package kv
 
 import (
 	"context"
+	"errors"
 )
+
+// KeyNotFoundError is currently not return, but can be used as common error
+var KeyNotFoundError = errors.New("key not found")
 
 //counterfeiter:generate -o mocks/bucket.go --fake-name Bucket . Bucket
 type Bucket interface {
