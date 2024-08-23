@@ -249,16 +249,6 @@ func (g vtaGraph) addEdge(x, y node) {
 	succs[y] = true
 }
 
-// successors returns all of n's immediate successors in the graph.
-// The order of successor nodes is arbitrary.
-func (g vtaGraph) successors(n node) []node {
-	var succs []node
-	for succ := range g[n] {
-		succs = append(succs, succ)
-	}
-	return succs
-}
-
 // typePropGraph builds a VTA graph for a set of `funcs` and initial
 // `callgraph` needed to establish interprocedural edges. Returns the
 // graph and a map for unique type representatives.
@@ -390,7 +380,7 @@ func (b *builder) unop(u *ssa.UnOp) {
 		// Multiplication operator * is used here as a dereference operator.
 		b.addInFlowAliasEdges(b.nodeFromVal(u), b.nodeFromVal(u.X))
 	case token.ARROW:
-		t := u.X.Type().Underlying().(*types.Chan).Elem()
+		t := typeparams.CoreType(u.X.Type()).(*types.Chan).Elem()
 		b.addInFlowAliasEdges(b.nodeFromVal(u), channelElem{typ: t})
 	default:
 		// There is no interesting type flow otherwise.
@@ -444,7 +434,7 @@ func (b *builder) fieldAddr(f *ssa.FieldAddr) {
 }
 
 func (b *builder) send(s *ssa.Send) {
-	t := s.Chan.Type().Underlying().(*types.Chan).Elem()
+	t := typeparams.CoreType(s.Chan.Type()).(*types.Chan).Elem()
 	b.addInFlowAliasEdges(channelElem{typ: t}, b.nodeFromVal(s.X))
 }
 
@@ -458,7 +448,7 @@ func (b *builder) send(s *ssa.Send) {
 func (b *builder) selekt(s *ssa.Select) {
 	recvIndex := 0
 	for _, state := range s.States {
-		t := state.Chan.Type().Underlying().(*types.Chan).Elem()
+		t := typeparams.CoreType(state.Chan.Type()).(*types.Chan).Elem()
 
 		if state.Dir == types.SendOnly {
 			b.addInFlowAliasEdges(channelElem{typ: t}, b.nodeFromVal(state.Send))
@@ -586,9 +576,10 @@ func (b *builder) call(c ssa.CallInstruction) {
 		return
 	}
 
-	for _, f := range siteCallees(c, b.callGraph) {
+	siteCallees(c, b.callGraph)(func(f *ssa.Function) bool {
 		addArgumentFlows(b, c, f)
-	}
+		return true
+	})
 }
 
 func addArgumentFlows(b *builder, c ssa.CallInstruction, f *ssa.Function) {

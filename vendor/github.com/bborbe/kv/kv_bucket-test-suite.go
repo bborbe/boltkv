@@ -75,10 +75,19 @@ func BucketTestSuite(provider Provider) {
 				})
 			})
 			Context("twise", func() {
+				var secondBucket Bucket
+				var thirdBucket Bucket
 				BeforeEach(func() {
 					Expect(db.Update(ctx, func(ctx context.Context, tx Tx) error {
-						_, err = tx.CreateBucketIfNotExists(ctx, bucketName)
-						return err
+						secondBucket, err = tx.CreateBucketIfNotExists(ctx, bucketName)
+						if err != nil {
+							return err
+						}
+						thirdBucket, err = tx.CreateBucketIfNotExists(ctx, bucketName)
+						if err != nil {
+							return err
+						}
+						return nil
 					})).To(BeNil())
 				})
 				It("returns no error", func() {
@@ -86,6 +95,11 @@ func BucketTestSuite(provider Provider) {
 				})
 				It("returns bucket", func() {
 					Expect(bucket).NotTo(BeNil())
+				})
+				It("return same bucket in same tx", func() {
+					Expect(secondBucket).NotTo(BeNil())
+					Expect(thirdBucket).NotTo(BeNil())
+					Expect(secondBucket).To(Equal(thirdBucket))
 				})
 			})
 		})
@@ -98,10 +112,23 @@ func BucketTestSuite(provider Provider) {
 				})
 			})
 			Context("success", func() {
+				var secondBucket Bucket
+				var thirdBucket Bucket
 				BeforeEach(func() {
 					Expect(db.Update(ctx, func(ctx context.Context, tx Tx) error {
 						_, err = tx.CreateBucket(ctx, bucketName)
-						return err
+						if err != nil {
+							return err
+						}
+						secondBucket, err = tx.Bucket(ctx, bucketName)
+						if err != nil {
+							return err
+						}
+						thirdBucket, err = tx.Bucket(ctx, bucketName)
+						if err != nil {
+							return err
+						}
+						return nil
 					})).To(BeNil())
 				})
 				It("returns no error", func() {
@@ -109,6 +136,11 @@ func BucketTestSuite(provider Provider) {
 				})
 				It("returns bucket", func() {
 					Expect(bucket).NotTo(BeNil())
+				})
+				It("return same bucket in same tx", func() {
+					Expect(secondBucket).NotTo(BeNil())
+					Expect(thirdBucket).NotTo(BeNil())
+					Expect(secondBucket).To(Equal(thirdBucket))
 				})
 			})
 			Context("failed", func() {
