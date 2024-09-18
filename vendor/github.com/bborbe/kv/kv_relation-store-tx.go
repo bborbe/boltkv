@@ -101,6 +101,9 @@ func (r relationStoreTx[ID, RelatedID]) Delete(ctx context.Context, tx Tx, id ID
 		return r.relationIdBucket.Add(ctx, tx, relatedID, result)
 	})
 	if err != nil {
+		if errors.Is(err, BucketNotFoundError) || errors.Is(err, KeyNotFoundError) {
+			return nil
+		}
 		return errors.Wrapf(ctx, err, "map failed")
 	}
 	if err := r.idRelationBucket.Remove(ctx, tx, id); err != nil {

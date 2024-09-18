@@ -6,6 +6,8 @@ package kv
 
 import (
 	"context"
+
+	"github.com/bborbe/errors"
 )
 
 //counterfeiter:generate -o mocks/relation-store.go --fake-name RelationStore . RelationStoreString
@@ -44,39 +46,63 @@ type relationStore[ID ~[]byte | ~string, RelatedID ~[]byte | ~string] struct {
 }
 
 func (r *relationStore[ID, RelatedID]) StreamIDs(ctx context.Context, ch chan<- ID) error {
-	return r.db.View(ctx, func(ctx context.Context, tx Tx) error {
+	err := r.db.View(ctx, func(ctx context.Context, tx Tx) error {
 		return r.relationStoreTx.StreamIDs(ctx, tx, ch)
 	})
+	if err != nil {
+		return errors.Wrapf(ctx, err, "view failed")
+	}
+	return nil
 }
 
 func (r *relationStore[ID, RelatedID]) StreamRelatedIDs(ctx context.Context, ch chan<- RelatedID) error {
-	return r.db.View(ctx, func(ctx context.Context, tx Tx) error {
+	err := r.db.View(ctx, func(ctx context.Context, tx Tx) error {
 		return r.relationStoreTx.StreamRelatedIDs(ctx, tx, ch)
 	})
+	if err != nil {
+		return errors.Wrapf(ctx, err, "view failed")
+	}
+	return nil
 }
 
 func (r *relationStore[ID, RelatedID]) Add(ctx context.Context, id ID, relatedIds []RelatedID) error {
-	return r.db.Update(ctx, func(ctx context.Context, tx Tx) error {
+	err := r.db.Update(ctx, func(ctx context.Context, tx Tx) error {
 		return r.relationStoreTx.Add(ctx, tx, id, relatedIds)
 	})
+	if err != nil {
+		return errors.Wrapf(ctx, err, "update failed")
+	}
+	return nil
 }
 
 func (r *relationStore[ID, RelatedID]) Replace(ctx context.Context, id ID, relatedIds []RelatedID) error {
-	return r.db.Update(ctx, func(ctx context.Context, tx Tx) error {
+	err := r.db.Update(ctx, func(ctx context.Context, tx Tx) error {
 		return r.relationStoreTx.Replace(ctx, tx, id, relatedIds)
 	})
+	if err != nil {
+		return errors.Wrapf(ctx, err, "update failed")
+	}
+	return nil
 }
 
 func (r *relationStore[ID, RelatedID]) Remove(ctx context.Context, id ID, relatedIds []RelatedID) error {
-	return r.db.Update(ctx, func(ctx context.Context, tx Tx) error {
+	err := r.db.Update(ctx, func(ctx context.Context, tx Tx) error {
 		return r.relationStoreTx.Remove(ctx, tx, id, relatedIds)
 	})
+	if err != nil {
+		return errors.Wrapf(ctx, err, "update failed")
+	}
+	return nil
 }
 
 func (r *relationStore[ID, RelatedID]) Delete(ctx context.Context, id ID) error {
-	return r.db.Update(ctx, func(ctx context.Context, tx Tx) error {
+	err := r.db.Update(ctx, func(ctx context.Context, tx Tx) error {
 		return r.relationStoreTx.Delete(ctx, tx, id)
 	})
+	if err != nil {
+		return errors.Wrapf(ctx, err, "update failed")
+	}
+	return nil
 }
 
 func (r *relationStore[ID, RelatedID]) RelatedIDs(ctx context.Context, id ID) ([]RelatedID, error) {
@@ -85,12 +111,12 @@ func (r *relationStore[ID, RelatedID]) RelatedIDs(ctx context.Context, id ID) ([
 	err = r.db.View(ctx, func(ctx context.Context, tx Tx) error {
 		result, err = r.relationStoreTx.RelatedIDs(ctx, tx, id)
 		if err != nil {
-			return err
+			return errors.Wrapf(ctx, err, "TODO")
 		}
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(ctx, err, "TODO")
 	}
 	return result, nil
 }
@@ -101,12 +127,12 @@ func (r *relationStore[ID, RelatedID]) IDs(ctx context.Context, relatedId Relate
 	err = r.db.View(ctx, func(ctx context.Context, tx Tx) error {
 		result, err = r.relationStoreTx.IDs(ctx, tx, relatedId)
 		if err != nil {
-			return err
+			return errors.Wrapf(ctx, err, "TODO")
 		}
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(ctx, err, "TODO")
 	}
 	return result, nil
 }

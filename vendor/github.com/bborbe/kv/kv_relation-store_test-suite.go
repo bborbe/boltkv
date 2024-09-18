@@ -83,26 +83,55 @@ func RelationStoreTestSuite(provider Provider) {
 			})
 		})
 		Context("Replace", func() {
+			var data map[string][]string
 			BeforeEach(func() {
-				err = relationStore.Add(ctx, "c1", []string{"banana"})
-				Expect(err).To(BeNil())
+				data = make(map[string][]string)
+			})
+
+			BeforeEach(func() {
+				for k, v := range data {
+					Expect(relationStore.Add(ctx, k, v)).To(BeNil())
+				}
 				err = relationStore.Replace(ctx, "c1", []string{"i1", "i2"})
 			})
-			It("returns no error", func() {
-				Expect(err).To(BeNil())
+			Context("without data", func() {
+				It("returns no error", func() {
+					Expect(err).To(BeNil())
+				})
+				It("returns IDs", func() {
+					ids, err := relationStore.IDs(ctx, "i1")
+					Expect(err).To(BeNil())
+					Expect(ids).To(HaveLen(1))
+					Expect(ids[0]).To(Equal("c1"))
+				})
+				It("returns RelatedIDs", func() {
+					ids, err := relationStore.RelatedIDs(ctx, "c1")
+					Expect(err).To(BeNil())
+					Expect(ids).To(HaveLen(2))
+					Expect(ids[0]).To(Equal("i1"))
+					Expect(ids[1]).To(Equal("i2"))
+				})
 			})
-			It("returns IDs", func() {
-				ids, err := relationStore.IDs(ctx, "i1")
-				Expect(err).To(BeNil())
-				Expect(ids).To(HaveLen(1))
-				Expect(ids[0]).To(Equal("c1"))
-			})
-			It("returns RelatedIDs", func() {
-				ids, err := relationStore.RelatedIDs(ctx, "c1")
-				Expect(err).To(BeNil())
-				Expect(ids).To(HaveLen(2))
-				Expect(ids[0]).To(Equal("i1"))
-				Expect(ids[1]).To(Equal("i2"))
+			Context("with data", func() {
+				BeforeEach(func() {
+					data["c1"] = []string{"banana"}
+				})
+				It("returns no error", func() {
+					Expect(err).To(BeNil())
+				})
+				It("returns IDs", func() {
+					ids, err := relationStore.IDs(ctx, "i1")
+					Expect(err).To(BeNil())
+					Expect(ids).To(HaveLen(1))
+					Expect(ids[0]).To(Equal("c1"))
+				})
+				It("returns RelatedIDs", func() {
+					ids, err := relationStore.RelatedIDs(ctx, "c1")
+					Expect(err).To(BeNil())
+					Expect(ids).To(HaveLen(2))
+					Expect(ids[0]).To(Equal("i1"))
+					Expect(ids[1]).To(Equal("i2"))
+				})
 			})
 		})
 		Context("Remove", func() {
