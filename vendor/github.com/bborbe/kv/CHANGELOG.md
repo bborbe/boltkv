@@ -8,6 +8,12 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.9.0
+
+- add remove to DB to delete the complete database
+- add handler for reset bucket and complete database
+- go mod update
+
 ## v1.8.2
 
 - fix replace in relationStore

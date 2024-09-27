@@ -19,7 +19,8 @@ require (
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/addlicense v1.1.1 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/pprof v0.0.0-20240910150728-a0b0bb1d4134 // indirect
+	github.com/google/pprof v0.0.0-20240925223930-fa3061bff0bc // indirect
+	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/incu6us/goimports-reviser v0.1.6 // indirect
 	github.com/kisielk/errcheck v1.7.0 // indirect
 	github.com/kr/text v0.2.0 // indirect

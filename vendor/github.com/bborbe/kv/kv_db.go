@@ -7,15 +7,24 @@ package kv
 import (
 	"context"
 	"errors"
-	"io"
 )
 
 var TransactionAlreadyOpenError = errors.New("transaction already open")
 
 //counterfeiter:generate -o mocks/db.go --fake-name DB . DB
 type DB interface {
+	// Update opens a write transaction
 	Update(ctx context.Context, fn func(ctx context.Context, tx Tx) error) error
+
+	// View opens a read only transaction
 	View(ctx context.Context, fn func(ctx context.Context, tx Tx) error) error
-	io.Closer
+
+	// Sync database to disk
 	Sync() error
+
+	// Close database
+	Close() error
+
+	// Remove database files from disk
+	Remove() error
 }

@@ -22,7 +22,6 @@ const stateCtxKey contextKey = "state"
 type DB interface {
 	libkv.DB
 	DB() *bolt.DB
-	Remove() error
 }
 
 type ChangeOptions func(opts *bolt.Options)
