@@ -32,7 +32,7 @@ type application struct {
 func (a *application) Run(ctx context.Context, sentryClient libsentry.Client) error {
 	db, err := boltkv.OpenDir(ctx, a.DataDir)
 	if err != nil {
-		return errors.Wrapf(ctx, err, "open faile")
+		return errors.Wrapf(ctx, err, "open failed")
 	}
 	err = db.View(ctx, func(ctx context.Context, tx libkv.Tx) error {
 		bucketNames, err := tx.ListBucketNames(ctx)

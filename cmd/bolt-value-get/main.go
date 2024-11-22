@@ -6,6 +6,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/bborbe/errors"
@@ -27,6 +28,7 @@ type application struct {
 	SentryProxy string `required:"false" arg:"sentry-proxy" env:"SENTRY_PROXY" usage:"Sentry Proxy"`
 	DataDir     string `required:"true" arg:"datadir" env:"DATADIR" usage:"data directory"`
 	Bucket      string `required:"true" arg:"bucket" env:"BUCKET" usage:"bucket name"`
+	Key         string `required:"true" arg:"key" env:"KEY" usage:"key read"`
 }
 
 func (a *application) Run(ctx context.Context, sentryClient libsentry.Client) error {
@@ -34,13 +36,23 @@ func (a *application) Run(ctx context.Context, sentryClient libsentry.Client) er
 	if err != nil {
 		return errors.Wrapf(ctx, err, "open failed")
 	}
-	bucketName := libkv.BucketName(a.Bucket)
-	err = db.Update(ctx, func(ctx context.Context, tx libkv.Tx) error {
-		return tx.DeleteBucket(ctx, bucketName)
+	err = db.View(ctx, func(ctx context.Context, tx libkv.Tx) error {
+		bucket, err := tx.Bucket(ctx, libkv.BucketName(a.Bucket))
+		if err != nil {
+			return errors.Wrapf(ctx, err, "get bucket failed")
+		}
+		v, err := bucket.Get(ctx, []byte(a.Key))
+		if err != nil {
+			return errors.Wrapf(ctx, err, "get key failed")
+		}
+		return v.Value(func(val []byte) error {
+			fmt.Printf("value: %s", string(val))
+			return nil
+		})
 	})
 	if err != nil {
 		return errors.Wrapf(ctx, err, "view failed")
 	}
-	glog.V(2).Infof("delete bucket %s completed", bucketName)
+	glog.V(4).Infof("done")
 	return nil
 }

@@ -6,6 +6,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/bborbe/errors"
@@ -34,13 +35,21 @@ func (a *application) Run(ctx context.Context, sentryClient libsentry.Client) er
 	if err != nil {
 		return errors.Wrapf(ctx, err, "open failed")
 	}
-	bucketName := libkv.BucketName(a.Bucket)
-	err = db.Update(ctx, func(ctx context.Context, tx libkv.Tx) error {
-		return tx.DeleteBucket(ctx, bucketName)
+	err = db.View(ctx, func(ctx context.Context, tx libkv.Tx) error {
+		bucket, err := tx.Bucket(ctx, libkv.BucketName(a.Bucket))
+		if err != nil {
+			return errors.Wrapf(ctx, err, "get bucket failed")
+		}
+		return libkv.ForEach(ctx, bucket, func(item libkv.Item) error {
+			return item.Value(func(val []byte) error {
+				fmt.Printf("%s = %s\n", string(item.Key()), string(val))
+				return nil
+			})
+		})
 	})
 	if err != nil {
 		return errors.Wrapf(ctx, err, "view failed")
 	}
-	glog.V(2).Infof("delete bucket %s completed", bucketName)
+	glog.V(4).Infof("done")
 	return nil
 }
