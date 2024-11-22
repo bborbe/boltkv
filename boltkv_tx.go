@@ -33,12 +33,13 @@ type tx struct {
 }
 
 func (t *tx) ListBucketNames(ctx context.Context) (libkv.BucketNames, error) {
-	t.mux.Lock()
-	defer t.mux.Unlock()
-
 	result := libkv.BucketNames{}
-	for bucketName := range t.cache {
-		result = append(result, libkv.BucketName(bucketName))
+	err := t.boltTx.ForEach(func(name []byte, buckets *bolt.Bucket) error {
+		result = append(result, name)
+		return nil
+	})
+	if err != nil {
+		return nil, errors.Wrapf(ctx, err, "foreach failed")
 	}
 	return result, nil
 }
