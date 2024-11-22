@@ -4,7 +4,21 @@
 
 package kv
 
-import "strings"
+import (
+	"bytes"
+	"strings"
+)
+
+type BucketNames []BucketName
+
+func (t BucketNames) Contains(value BucketName) bool {
+	for _, tt := range t {
+		if tt.Equal(value) {
+			return true
+		}
+	}
+	return false
+}
 
 func BucketFromStrings(values ...string) BucketName {
 
@@ -17,10 +31,14 @@ func NewBucketName(name string) BucketName {
 
 type BucketName []byte
 
-func (f BucketName) String() string {
-	return string(f)
+func (b BucketName) String() string {
+	return string(b)
 }
 
-func (f BucketName) Bytes() []byte {
-	return f
+func (b BucketName) Bytes() []byte {
+	return b
+}
+
+func (b BucketName) Equal(value BucketName) bool {
+	return bytes.Compare(b, value) == 0
 }

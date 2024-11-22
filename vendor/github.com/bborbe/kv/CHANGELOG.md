@@ -8,6 +8,16 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.10.0
+
+- add ListBucketNames
+- go mod update
+
+## v1.9.1
+
+- ignore BucketNotFoundError on Map, Remove and Exists
+- go mod update
+
 ## v1.9.0
 
 - add remove to DB to delete the complete database

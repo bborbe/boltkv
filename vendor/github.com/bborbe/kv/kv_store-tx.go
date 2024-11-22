@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 
 	"github.com/bborbe/errors"
+	"github.com/golang/glog"
 )
 
 type StoreMapperTx[KEY ~[]byte | ~string, OBJECT any] interface {
@@ -72,6 +73,10 @@ func (s storeTx[KEY, OBJECT]) Add(ctx context.Context, tx Tx, key KEY, object OB
 func (s storeTx[KEY, OBJECT]) Remove(ctx context.Context, tx Tx, key KEY) error {
 	bucket, err := tx.CreateBucketIfNotExists(ctx, s.bucketName)
 	if err != nil {
+		if errors.Is(err, BucketNotFoundError) {
+			glog.V(3).Infof("bucket %s not found", s.bucketName)
+			return nil
+		}
 		return errors.Wrapf(ctx, err, "get bucket failed")
 	}
 	if err := bucket.Delete(ctx, []byte(key)); err != nil {
@@ -105,6 +110,10 @@ func (s storeTx[KEY, OBJECT]) Get(ctx context.Context, tx Tx, key KEY) (*OBJECT,
 func (s storeTx[KEY, OBJECT]) Exists(ctx context.Context, tx Tx, key KEY) (bool, error) {
 	bucket, err := tx.Bucket(ctx, s.bucketName)
 	if err != nil {
+		if errors.Is(err, BucketNotFoundError) {
+			glog.V(3).Infof("bucket %s not found", s.bucketName)
+			return false, nil
+		}
 		return false, errors.Wrapf(ctx, err, "get bucket failed")
 	}
 	item, err := bucket.Get(ctx, []byte(key))
@@ -117,6 +126,10 @@ func (s storeTx[KEY, OBJECT]) Exists(ctx context.Context, tx Tx, key KEY) (bool,
 func (s storeTx[KEY, OBJECT]) Map(ctx context.Context, tx Tx, fn func(ctx context.Context, key KEY, object OBJECT) error) error {
 	bucket, err := tx.Bucket(ctx, s.bucketName)
 	if err != nil {
+		if errors.Is(err, BucketNotFoundError) {
+			glog.V(3).Infof("bucket %s not found", s.bucketName)
+			return nil
+		}
 		return errors.Wrapf(ctx, err, "get bucket failed")
 	}
 	it := bucket.Iterator()

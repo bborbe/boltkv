@@ -32,6 +32,17 @@ type tx struct {
 	cache map[string]libkv.Bucket
 }
 
+func (t *tx) ListBucketNames(ctx context.Context) (libkv.BucketNames, error) {
+	t.mux.Lock()
+	defer t.mux.Unlock()
+
+	result := libkv.BucketNames{}
+	for bucketName := range t.cache {
+		result = append(result, libkv.BucketName(bucketName))
+	}
+	return result, nil
+}
+
 func (t *tx) Tx() *bolt.Tx {
 	return t.boltTx
 }

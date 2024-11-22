@@ -18,4 +18,5 @@ type Tx interface {
 	CreateBucket(ctx context.Context, name BucketName) (Bucket, error)
 	CreateBucketIfNotExists(ctx context.Context, name BucketName) (Bucket, error)
 	DeleteBucket(ctx context.Context, name BucketName) error
+	ListBucketNames(ctx context.Context) (BucketNames, error)
 }
