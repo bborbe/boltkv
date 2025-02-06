@@ -47,6 +47,21 @@ func RelationStoreTestSuite(provider Provider) {
 				})
 			})
 		})
+		Context("Invert", func() {
+			BeforeEach(func() {
+				Expect(relationStore.Add(ctx, "k1", []string{"v1", "v2"})).To(BeNil())
+			})
+			It("returns ids", func() {
+				values, err := relationStore.RelatedIDs(ctx, "k1")
+				Expect(err).To(BeNil())
+				Expect(values).To(Equal([]string{"v1", "v2"}))
+			})
+			It("returns inverted ids", func() {
+				values, err := relationStore.Invert().RelatedIDs(ctx, "v1")
+				Expect(err).To(BeNil())
+				Expect(values).To(Equal([]string{"k1"}))
+			})
+		})
 		Context("RelatedIDs", func() {
 			var ids []string
 			Context("empty", func() {
@@ -159,8 +174,8 @@ func RelationStoreTestSuite(provider Provider) {
 		})
 		Context("Delete", func() {
 			BeforeEach(func() {
-				err = relationStore.Add(ctx, "c1", []string{"i1", "i2"})
-				Expect(err).To(BeNil())
+				Expect(relationStore.Add(ctx, "c1", []string{"i1", "i2"})).To(BeNil())
+				Expect(relationStore.Add(ctx, "c2", []string{"i1", "i2"})).To(BeNil())
 				err = relationStore.Delete(ctx, "c1")
 			})
 			It("returns no error", func() {
@@ -169,12 +184,18 @@ func RelationStoreTestSuite(provider Provider) {
 			It("returns IDs", func() {
 				ids, err := relationStore.IDs(ctx, "i1")
 				Expect(err).To(BeNil())
-				Expect(ids).To(HaveLen(0))
+				Expect(ids).To(HaveLen(1))
+				Expect(ids[0]).To(Equal("c2"))
 			})
-			It("returns RelatedIDs", func() {
+			It("returns RelatedIDs of c1", func() {
 				ids, err := relationStore.RelatedIDs(ctx, "c1")
 				Expect(err).To(BeNil())
 				Expect(ids).To(HaveLen(0))
+			})
+			It("returns RelatedIDs of c2", func() {
+				ids, err := relationStore.RelatedIDs(ctx, "c2")
+				Expect(err).To(BeNil())
+				Expect(ids).To(HaveLen(2))
 			})
 		})
 		Context("StreamIDs", func() {
@@ -223,7 +244,6 @@ func RelationStoreTestSuite(provider Provider) {
 				})
 			})
 		})
-
 		Context("StreamRelatedIDs", func() {
 			var result []string
 			JustBeforeEach(func() {

@@ -5,7 +5,6 @@
 package kv
 
 import (
-	"bytes"
 	"context"
 
 	"github.com/bborbe/errors"
@@ -27,25 +26,57 @@ type RelationStoreTx[ID ~[]byte | ~string, RelatedID ~[]byte | ~string] interfac
 	RelatedIDs(ctx context.Context, tx Tx, id ID) ([]RelatedID, error)
 	// IDs return all ids of RelatedID
 	IDs(ctx context.Context, tx Tx, relatedId RelatedID) ([]ID, error)
-	// StreamIDs return all existings IDs
+	// StreamIDs return all existing IDs
 	StreamIDs(ctx context.Context, tx Tx, ch chan<- ID) error
-	// StreamRelatedIDs return all existings relationIDs
+	// StreamRelatedIDs return all existing relationIDs
 	StreamRelatedIDs(ctx context.Context, tx Tx, ch chan<- RelatedID) error
+	// Invert returns the same store with flipped ID <-> RelationID
+	Invert() RelationStoreTx[RelatedID, ID]
+	// MapIDRelations maps all entry to the given func
+	MapIDRelations(ctx context.Context, tx Tx, fn func(ctx context.Context, key ID, relatedIDs []RelatedID) error) error
+	// MapRelationIDs maps all entry to the given func
+	MapRelationIDs(ctx context.Context, tx Tx, fn func(ctx context.Context, key RelatedID, ids []ID) error) error
 }
 
 func NewRelationStoreTx[ID ~[]byte | ~string, RelatedID ~[]byte | ~string](name string) RelationStoreTx[ID, RelatedID] {
+	return NewRelationStoreTxWithBucket(
+		NewStoreTx[ID, []RelatedID](BucketFromStrings(name, "id", "relation")),
+		NewStoreTx[RelatedID, []ID](BucketFromStrings(name, "relation", "id")),
+	)
+}
+
+func NewRelationStoreTxWithBucket[ID ~[]byte | ~string, RelatedID ~[]byte | ~string](
+	idRelationBucket StoreTx[ID, []RelatedID],
+	relationIdBucket StoreTx[RelatedID, []ID],
+) RelationStoreTx[ID, RelatedID] {
 	return &relationStoreTx[ID, RelatedID]{
-		relationIdBucket: NewStoreTx[RelatedID, []ID](BucketFromStrings(name, "relation", "id")),
-		idRelationBucket: NewStoreTx[ID, []RelatedID](BucketFromStrings(name, "id", "relation")),
+		idRelationBucket: idRelationBucket,
+		relationIdBucket: relationIdBucket,
 	}
 }
 
 type relationStoreTx[ID ~[]byte | ~string, RelatedID ~[]byte | ~string] struct {
 	idRelationBucket StoreTx[ID, []RelatedID]
 	relationIdBucket StoreTx[RelatedID, []ID]
+	name             string
 }
 
-func (r relationStoreTx[ID, RelatedID]) Add(ctx context.Context, tx Tx, id ID, relatedIds []RelatedID) error {
+func (r *relationStoreTx[ID, RelatedID]) Invert() RelationStoreTx[RelatedID, ID] {
+	return NewRelationStoreTxWithBucket[RelatedID, ID](
+		r.relationIdBucket,
+		r.idRelationBucket,
+	)
+}
+
+func (r relationStoreTx[ID, RelatedID]) MapIDRelations(ctx context.Context, tx Tx, fn func(ctx context.Context, key ID, relatedIDs []RelatedID) error) error {
+	return r.idRelationBucket.Map(ctx, tx, fn)
+}
+
+func (r relationStoreTx[ID, RelatedID]) MapRelationIDs(ctx context.Context, tx Tx, fn func(ctx context.Context, key RelatedID, ids []ID) error) error {
+	return r.relationIdBucket.Map(ctx, tx, fn)
+}
+
+func (r *relationStoreTx[ID, RelatedID]) Add(ctx context.Context, tx Tx, id ID, relatedIds []RelatedID) error {
 	currentRelationIDs, err := r.RelatedIDs(ctx, tx, id)
 	if err != nil {
 		return errors.Wrapf(ctx, err, "get relationIDs failed")
@@ -67,7 +98,7 @@ func (r relationStoreTx[ID, RelatedID]) Add(ctx context.Context, tx Tx, id ID, r
 	return nil
 }
 
-func (r relationStoreTx[ID, RelatedID]) Remove(ctx context.Context, tx Tx, id ID, relatedIds []RelatedID) error {
+func (r *relationStoreTx[ID, RelatedID]) Remove(ctx context.Context, tx Tx, id ID, relatedIds []RelatedID) error {
 	currentRelationIDs, err := r.RelatedIDs(ctx, tx, id)
 	if err != nil {
 		return errors.Wrapf(ctx, err, "get relationIDs failed")
@@ -89,30 +120,21 @@ func (r relationStoreTx[ID, RelatedID]) Remove(ctx context.Context, tx Tx, id ID
 	return nil
 }
 
-func (r relationStoreTx[ID, RelatedID]) Delete(ctx context.Context, tx Tx, id ID) error {
-	err := r.relationIdBucket.Map(ctx, tx, func(ctx context.Context, relatedID RelatedID, ids []ID) error {
-		result := make([]ID, 0)
-		for _, i := range ids {
-			if bytes.Compare([]byte(id), []byte(i)) == 0 {
-				continue
-			}
-			result = append(result, id)
-		}
-		return r.relationIdBucket.Add(ctx, tx, relatedID, result)
-	})
+func (r *relationStoreTx[ID, RelatedID]) Delete(ctx context.Context, tx Tx, id ID) error {
+	relatedIDs, err := r.RelatedIDs(ctx, tx, id)
 	if err != nil {
-		if errors.Is(err, BucketNotFoundError) || errors.Is(err, KeyNotFoundError) {
-			return nil
-		}
-		return errors.Wrapf(ctx, err, "map failed")
+		return errors.Wrapf(ctx, err, "get relationIDs for id %s failed", id)
+	}
+	if err := r.Remove(ctx, tx, id, relatedIDs); err != nil {
+		return errors.Wrapf(ctx, err, "remove relationIDs for id %s failed", id)
 	}
 	if err := r.idRelationBucket.Remove(ctx, tx, id); err != nil {
-		return err
+		return errors.Wrapf(ctx, err, "remove id %s failed", id)
 	}
 	return nil
 }
 
-func (r relationStoreTx[ID, RelatedID]) Replace(ctx context.Context, tx Tx, id ID, relatedIds []RelatedID) error {
+func (r *relationStoreTx[ID, RelatedID]) Replace(ctx context.Context, tx Tx, id ID, relatedIds []RelatedID) error {
 	if err := r.Delete(ctx, tx, id); err != nil {
 		return err
 	}
@@ -122,7 +144,7 @@ func (r relationStoreTx[ID, RelatedID]) Replace(ctx context.Context, tx Tx, id I
 	return nil
 }
 
-func (r relationStoreTx[ID, RelatedID]) RelatedIDs(ctx context.Context, tx Tx, id ID) ([]RelatedID, error) {
+func (r *relationStoreTx[ID, RelatedID]) RelatedIDs(ctx context.Context, tx Tx, id ID) ([]RelatedID, error) {
 	result, err := r.idRelationBucket.Get(ctx, tx, id)
 	if err != nil {
 		if errors.Is(err, BucketNotFoundError) || errors.Is(err, KeyNotFoundError) {
@@ -133,7 +155,7 @@ func (r relationStoreTx[ID, RelatedID]) RelatedIDs(ctx context.Context, tx Tx, i
 	return *result, nil
 }
 
-func (r relationStoreTx[ID, RelatedID]) IDs(ctx context.Context, tx Tx, relatedId RelatedID) ([]ID, error) {
+func (r *relationStoreTx[ID, RelatedID]) IDs(ctx context.Context, tx Tx, relatedId RelatedID) ([]ID, error) {
 	result, err := r.relationIdBucket.Get(ctx, tx, relatedId)
 	if err != nil {
 		if errors.Is(err, BucketNotFoundError) || errors.Is(err, KeyNotFoundError) {
@@ -144,7 +166,7 @@ func (r relationStoreTx[ID, RelatedID]) IDs(ctx context.Context, tx Tx, relatedI
 	return *result, nil
 }
 
-func (r relationStoreTx[ID, RelatedID]) StreamIDs(ctx context.Context, tx Tx, ch chan<- ID) error {
+func (r *relationStoreTx[ID, RelatedID]) StreamIDs(ctx context.Context, tx Tx, ch chan<- ID) error {
 	err := r.idRelationBucket.Map(ctx, tx, func(ctx context.Context, key ID, object []RelatedID) error {
 		select {
 		case <-ctx.Done():
@@ -162,7 +184,7 @@ func (r relationStoreTx[ID, RelatedID]) StreamIDs(ctx context.Context, tx Tx, ch
 	return nil
 }
 
-func (r relationStoreTx[ID, RelatedID]) StreamRelatedIDs(ctx context.Context, tx Tx, ch chan<- RelatedID) error {
+func (r *relationStoreTx[ID, RelatedID]) StreamRelatedIDs(ctx context.Context, tx Tx, ch chan<- RelatedID) error {
 	err := r.relationIdBucket.Map(ctx, tx, func(ctx context.Context, key RelatedID, object []ID) error {
 		select {
 		case <-ctx.Done():

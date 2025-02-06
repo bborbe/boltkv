@@ -8,6 +8,37 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.12.0
+
+- add Invert for the RelationStore and RelationStoreTx
+
+## v1.11.5
+
+- add MapIDRelations and MapRelationIDs
+
+## v1.11.4
+
+- remove performance bug in relationStoreTx delete
+
+## v1.11.3
+
+- move JsonHandlerTx to github.com/bborbe/http
+- go mod update
+
+## v1.11.2
+
+- add missing license file
+- go mod update
+
+## v1.11.1
+
+- rename NewUpdateHandlerViewTx -> NewJsonHandlerUpdateTx
+
+## v1.11.0
+
+- add JsonHandlerTx
+- go mod update
+
 ## v1.10.0
 
 - add ListBucketNames

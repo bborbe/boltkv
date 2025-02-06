@@ -27,15 +27,31 @@ type RelationStore[ID ~[]byte | ~string, RelatedID ~[]byte | ~string] interface 
 	RelatedIDs(ctx context.Context, id ID) ([]RelatedID, error)
 	// IDs return all ids of RelatedID
 	IDs(ctx context.Context, relatedId RelatedID) ([]ID, error)
-	// StreamIDs return all existings IDs
+	// StreamIDs return all existing IDs
 	StreamIDs(ctx context.Context, ch chan<- ID) error
-	// StreamRelatedIDs return all existings relationIDs
+	// StreamRelatedIDs return all existing relationIDs
 	StreamRelatedIDs(ctx context.Context, ch chan<- RelatedID) error
+	// MapIDRelations maps all entry to the given func
+	MapIDRelations(ctx context.Context, fn func(ctx context.Context, key ID, relatedIDs []RelatedID) error) error
+	// MapRelationIDs maps all entry to the given func
+	MapRelationIDs(ctx context.Context, fn func(ctx context.Context, key RelatedID, ids []ID) error) error
+	// Invert returns the same store with flipped ID <-> RelationID
+	Invert() RelationStore[RelatedID, ID]
 }
 
 func NewRelationStore[ID ~[]byte | ~string, RelatedID ~[]byte | ~string](db DB, name string) RelationStore[ID, RelatedID] {
+	return NewRelationStoreFromRelationStoreTx(
+		db,
+		NewRelationStoreTx[ID, RelatedID](name),
+	)
+}
+
+func NewRelationStoreFromRelationStoreTx[ID ~[]byte | ~string, RelatedID ~[]byte | ~string](
+	db DB,
+	storeTx RelationStoreTx[ID, RelatedID],
+) RelationStore[ID, RelatedID] {
 	return &relationStore[ID, RelatedID]{
-		relationStoreTx: NewRelationStoreTx[ID, RelatedID](name),
+		relationStoreTx: storeTx,
 		db:              db,
 	}
 }
@@ -43,6 +59,34 @@ func NewRelationStore[ID ~[]byte | ~string, RelatedID ~[]byte | ~string](db DB, 
 type relationStore[ID ~[]byte | ~string, RelatedID ~[]byte | ~string] struct {
 	relationStoreTx RelationStoreTx[ID, RelatedID]
 	db              DB
+}
+
+
+func (r *relationStore[ID, RelatedID]) MapIDRelations(ctx context.Context, fn func(ctx context.Context, key ID, relatedIDs []RelatedID) error) error {
+	err := r.db.View(ctx, func(ctx context.Context, tx Tx) error {
+		return r.relationStoreTx.MapIDRelations(ctx, tx, fn)
+	})
+	if err != nil {
+		return errors.Wrapf(ctx, err, "view failed")
+	}
+	return nil
+}
+
+func (r *relationStore[ID, RelatedID]) MapRelationIDs(ctx context.Context, fn func(ctx context.Context, key RelatedID, ids []ID) error) error {
+	err := r.db.View(ctx, func(ctx context.Context, tx Tx) error {
+		return r.relationStoreTx.MapRelationIDs(ctx, tx, fn)
+	})
+	if err != nil {
+		return errors.Wrapf(ctx, err, "view failed")
+	}
+	return nil
+}
+
+func (r *relationStore[ID, RelatedID]) Invert() RelationStore[RelatedID, ID] {
+	return NewRelationStoreFromRelationStoreTx(
+		r.db,
+		r.relationStoreTx.Invert(),
+	)
 }
 
 func (r *relationStore[ID, RelatedID]) StreamIDs(ctx context.Context, ch chan<- ID) error {

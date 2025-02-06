@@ -8,6 +8,62 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.12.0
+
+- refactor WaiterUntil
+- add WaiterDuration
+
+## v1.11.6
+
+- allow NOW-1d
+- go mod update
+
+## v1.11.5
+
+- add UnixTime.DateTime
+
+## v1.11.4
+
+- add UnixTime.Truncate
+
+## v1.11.3
+
+- add DateTime.Truncate
+
+## v1.11.2
+
+- improve ParseDuration
+
+## v1.11.1
+
+- DateTime.Add use Duration
+
+## v1.11.0
+
+- add CurrentDateTime
+
+## v1.10.0
+
+- clean Duration.String() (1h15m0s => 1h15m) 
+
+## v1.9.1
+
+- add Time.Sub 
+- add Duration.Abs
+
+## v1.9.0
+
+- Duration.String output now days and weeks like: 10w5d23h59m30s
+- go mod update
+
+## v1.8.2
+
+- add list types
+
+## v1.8.1
+
+- allow parse timeOfDay with seconds
+
 ## v1.8.0
 
 - allow unmarshal NOW
