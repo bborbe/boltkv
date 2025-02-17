@@ -31,6 +31,10 @@ type RelationStore[ID ~[]byte | ~string, RelatedID ~[]byte | ~string] interface 
 	StreamIDs(ctx context.Context, ch chan<- ID) error
 	// StreamRelatedIDs return all existings relationIDs
 	StreamRelatedIDs(ctx context.Context, ch chan<- RelatedID) error
+	// MapIDRelations maps all entry to the given func
+	MapIDRelations(ctx context.Context, fn func(ctx context.Context, key ID, relatedIDs []RelatedID) error) error
+	// MapRelationIDs maps all entry to the given func
+	MapRelationIDs(ctx context.Context, fn func(ctx context.Context, key RelatedID, ids []ID) error) error
 }
 
 func NewRelationStore[ID ~[]byte | ~string, RelatedID ~[]byte | ~string](db DB, name string) RelationStore[ID, RelatedID] {
@@ -43,6 +47,26 @@ func NewRelationStore[ID ~[]byte | ~string, RelatedID ~[]byte | ~string](db DB, 
 type relationStore[ID ~[]byte | ~string, RelatedID ~[]byte | ~string] struct {
 	relationStoreTx RelationStoreTx[ID, RelatedID]
 	db              DB
+}
+
+func (r *relationStore[ID, RelatedID]) MapIDRelations(ctx context.Context, fn func(ctx context.Context, key ID, relatedIDs []RelatedID) error) error {
+	err := r.db.View(ctx, func(ctx context.Context, tx Tx) error {
+		return r.relationStoreTx.MapIDRelations(ctx, tx, fn)
+	})
+	if err != nil {
+		return errors.Wrapf(ctx, err, "view failed")
+	}
+	return nil
+}
+
+func (r *relationStore[ID, RelatedID]) MapRelationIDs(ctx context.Context, fn func(ctx context.Context, key RelatedID, ids []ID) error) error {
+	err := r.db.View(ctx, func(ctx context.Context, tx Tx) error {
+		return r.relationStoreTx.MapRelationIDs(ctx, tx, fn)
+	})
+	if err != nil {
+		return errors.Wrapf(ctx, err, "view failed")
+	}
+	return nil
 }
 
 func (r *relationStore[ID, RelatedID]) StreamIDs(ctx context.Context, ch chan<- ID) error {
