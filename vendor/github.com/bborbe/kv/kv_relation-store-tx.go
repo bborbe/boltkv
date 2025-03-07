@@ -10,7 +10,7 @@ import (
 	"github.com/bborbe/errors"
 )
 
-//counterfeiter:generate -o mocks/relation-store-tx.go --fake-name RelationStoreTx . RelationStoreTxString
+//counterfeiter:generate -o mocks/relation-store-tx-string.go --fake-name RelationStoreTxString . RelationStoreTxString
 type RelationStoreTxString RelationStoreTx[string, string]
 
 type RelationStoreTx[ID ~[]byte | ~string, RelatedID ~[]byte | ~string] interface {

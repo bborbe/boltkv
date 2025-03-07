@@ -10,7 +10,7 @@ import (
 	"github.com/bborbe/errors"
 )
 
-//counterfeiter:generate -o mocks/relation-store.go --fake-name RelationStore . RelationStoreString
+//counterfeiter:generate -o mocks/relation-store-string.go --fake-name RelationStoreString . RelationStoreString
 type RelationStoreString RelationStore[string, string]
 
 // RelationStore implement a forward and backword id lookup for a 1:N relation.
@@ -60,7 +60,6 @@ type relationStore[ID ~[]byte | ~string, RelatedID ~[]byte | ~string] struct {
 	relationStoreTx RelationStoreTx[ID, RelatedID]
 	db              DB
 }
-
 
 func (r *relationStore[ID, RelatedID]) MapIDRelations(ctx context.Context, fn func(ctx context.Context, key ID, relatedIDs []RelatedID) error) error {
 	err := r.db.View(ctx, func(ctx context.Context, tx Tx) error {
