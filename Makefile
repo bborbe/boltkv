@@ -7,7 +7,7 @@ precommit: ensure format generate test check addlicense
 ensure:
 	go mod tidy
 	go mod verify
-	go mod vendor
+	rm -rf vendor
 
 format:
 	find . -type f -name '*.go' -not -path './vendor/*' -exec gofmt -w "{}" +
@@ -15,9 +15,7 @@ format:
 
 generate:
 	rm -rf mocks avro
-	mkdir -p mocks
-	echo "package mocks" > mocks/mocks.go
-	go generate -mod=mod $(shell go list -mod=mod ./... | grep -v /vendor/)
+	go generate -mod=mod ./...
 
 test:
 	go test -mod=mod -p=$${GO_TEST_PARALLEL:-1} -cover -race $(shell go list -mod=mod ./... | grep -v /vendor/)

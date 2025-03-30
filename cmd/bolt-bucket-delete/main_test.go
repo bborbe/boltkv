@@ -15,7 +15,7 @@ import (
 var _ = Describe("Main", func() {
 	It("Compiles", func() {
 		var err error
-		_, err = gexec.Build("github.com/bborbe/boltkv/cmd/bolt-bucket-delete", "-mod=vendor")
+		_, err = gexec.Build("github.com/bborbe/boltkv/cmd/bolt-bucket-delete", "-mod=mod")
 		Expect(err).NotTo(HaveOccurred())
 	})
 })
