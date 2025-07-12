@@ -7,8 +7,10 @@ package boltkv_test
 import (
 	"context"
 	"os"
+	"path/filepath"
 
 	"github.com/bborbe/errors"
+	libkv "github.com/bborbe/kv"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -56,6 +58,126 @@ var _ = Describe("DB", func() {
 			Expect(fileExists(file.Name())).To(BeTrue())
 			Expect(db.Remove()).To(BeNil())
 			Expect(fileExists(file.Name())).To(BeFalse())
+		})
+	})
+	Context("OpenDir", func() {
+		var tempDir string
+		BeforeEach(func() {
+			tempDir, err = os.MkdirTemp("", "")
+			Expect(err).To(BeNil())
+		})
+		JustBeforeEach(func() {
+			db, err = boltkv.OpenDir(ctx, tempDir)
+		})
+		AfterEach(func() {
+			_ = db.Close()
+			_ = os.RemoveAll(tempDir)
+		})
+		It("returns no error", func() {
+			Expect(err).To(BeNil())
+		})
+		It("creates db file in directory", func() {
+			dbPath := filepath.Join(tempDir, "bolt.db")
+			Expect(fileExists(dbPath)).To(BeTrue())
+		})
+	})
+	Context("OpenDir with non-existent directory", func() {
+		var tempDir string
+		BeforeEach(func() {
+			tempDir = filepath.Join(os.TempDir(), "nonexistent", "nested")
+		})
+		JustBeforeEach(func() {
+			db, err = boltkv.OpenDir(ctx, tempDir)
+		})
+		AfterEach(func() {
+			if db != nil {
+				_ = db.Close()
+			}
+			_ = os.RemoveAll(filepath.Dir(tempDir))
+		})
+		It("creates directory and returns no error", func() {
+			Expect(err).To(BeNil())
+			Expect(fileExists(tempDir)).To(BeTrue())
+		})
+	})
+	Context("OpenTemp", func() {
+		JustBeforeEach(func() {
+			db, err = boltkv.OpenTemp(ctx)
+		})
+		AfterEach(func() {
+			_ = db.Close()
+			_ = db.Remove()
+		})
+		It("returns no error", func() {
+			Expect(err).To(BeNil())
+		})
+		It("creates temporary file", func() {
+			Expect(db.DB().Path()).ToNot(BeEmpty())
+			Expect(fileExists(db.DB().Path())).To(BeTrue())
+		})
+	})
+	Context("BoltDB-specific methods", func() {
+		BeforeEach(func() {
+			db, err = boltkv.OpenTemp(ctx)
+			Expect(err).To(BeNil())
+		})
+		AfterEach(func() {
+			_ = db.Close()
+			_ = db.Remove()
+		})
+		It("provides access to underlying BoltDB", func() {
+			boltDB := db.DB()
+			Expect(boltDB).ToNot(BeNil())
+			Expect(boltDB.Path()).ToNot(BeEmpty())
+		})
+		It("syncs database", func() {
+			err := db.Sync()
+			Expect(err).To(BeNil())
+		})
+	})
+	Context("Transaction state management", func() {
+		BeforeEach(func() {
+			db, err = boltkv.OpenTemp(ctx)
+			Expect(err).To(BeNil())
+		})
+		AfterEach(func() {
+			_ = db.Close()
+			_ = db.Remove()
+		})
+		It("detects when no transaction is open", func() {
+			Expect(boltkv.IsTransactionOpen(ctx)).To(BeFalse())
+		})
+		It("detects open transaction during View", func() {
+			err := db.View(ctx, func(ctx context.Context, tx libkv.Tx) error {
+				Expect(boltkv.IsTransactionOpen(ctx)).To(BeTrue())
+				return nil
+			})
+			Expect(err).To(BeNil())
+		})
+		It("detects open transaction during Update", func() {
+			err := db.Update(ctx, func(ctx context.Context, tx libkv.Tx) error {
+				Expect(boltkv.IsTransactionOpen(ctx)).To(BeTrue())
+				return nil
+			})
+			Expect(err).To(BeNil())
+		})
+		It("prevents nested transactions in View", func() {
+			err := db.View(ctx, func(ctx context.Context, tx libkv.Tx) error {
+				return db.View(ctx, func(ctx context.Context, tx libkv.Tx) error {
+					return nil
+				})
+			})
+			Expect(err).ToNot(BeNil())
+			Expect(errors.Is(err, libkv.TransactionAlreadyOpenError)).To(BeTrue())
+		})
+		It("prevents nested transactions in Update", func() {
+			err := db.Update(ctx, func(ctx context.Context, tx libkv.Tx) error {
+				return db.Update(ctx, func(ctx context.Context, tx libkv.Tx) error {
+					return nil
+				})
+			})
+			Expect(err).ToNot(BeNil())
+			Expect(errors.Is(err, libkv.TransactionAlreadyOpenError)).To(BeTrue())
 		})
 	})
 })
