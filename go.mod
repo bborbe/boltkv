@@ -1,31 +1,38 @@
 module github.com/bborbe/boltkv
 
-go 1.24.4
+go 1.24.5
 
 //replace github.com/bborbe/kv => ../kv
+exclude (
+	cloud.google.com/go v0.26.0
+	sigs.k8s.io/structured-merge-diff/v6 v6.0.0
+	sigs.k8s.io/structured-merge-diff/v6 v6.1.0
+	sigs.k8s.io/structured-merge-diff/v6 v6.2.0
+	sigs.k8s.io/structured-merge-diff/v6 v6.3.0
+)
 
 require (
 	github.com/bborbe/errors v1.3.0
-	github.com/bborbe/kv v1.14.0
+	github.com/bborbe/kv v1.14.1
 	github.com/bborbe/sentry v1.8.0
 	github.com/bborbe/service v1.6.2
 	github.com/golang/glog v1.2.5
 	github.com/onsi/ginkgo/v2 v2.23.4
-	github.com/onsi/gomega v1.37.0
+	github.com/onsi/gomega v1.38.0
 	go.etcd.io/bbolt v1.4.2
 )
 
 require (
 	github.com/actgardner/gogen-avro/v9 v9.2.0 // indirect
-	github.com/bborbe/argument/v2 v2.3.0 // indirect
-	github.com/bborbe/collection v1.9.0 // indirect
+	github.com/bborbe/argument/v2 v2.3.1 // indirect
+	github.com/bborbe/collection v1.9.1 // indirect
 	github.com/bborbe/math v1.2.0 // indirect
-	github.com/bborbe/parse v1.7.0 // indirect
-	github.com/bborbe/run v1.7.3 // indirect
-	github.com/bborbe/time v1.16.1 // indirect
+	github.com/bborbe/parse v1.7.1 // indirect
+	github.com/bborbe/run v1.7.5 // indirect
+	github.com/bborbe/time v1.16.2 // indirect
 	github.com/bborbe/validation v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bmatcuk/doublestar/v4 v4.8.1 // indirect
+	github.com/bmatcuk/doublestar/v4 v4.9.0 // indirect
 	github.com/certifi/gocertifi v0.0.0-20210507211836-431795d63e8d // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/getsentry/raven-go v0.2.0 // indirect
@@ -39,7 +46,7 @@ require (
 	github.com/incu6us/goimports-reviser v0.1.6 // indirect
 	github.com/incu6us/goimports-reviser/v3 v3.9.1 // indirect
 	github.com/kisielk/errcheck v1.9.0 // indirect
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.11.2 // indirect
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.11.3 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.22.0 // indirect
@@ -47,13 +54,13 @@ require (
 	github.com/prometheus/common v0.65.0 // indirect
 	github.com/prometheus/procfs v0.17.0 // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
-	golang.org/x/exp v0.0.0-20250711185948-6ae5c78190dc // indirect
+	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792 // indirect
 	golang.org/x/lint v0.0.0-20241112194109-818c5a804067 // indirect
 	golang.org/x/mod v0.26.0 // indirect
 	golang.org/x/net v0.42.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
-	golang.org/x/telemetry v0.0.0-20250710130107-8d8967aff50b // indirect
+	golang.org/x/telemetry v0.0.0-20250721140356-96f361d9aaf7 // indirect
 	golang.org/x/text v0.27.0 // indirect
 	golang.org/x/tools v0.35.0 // indirect
 	golang.org/x/vuln v1.1.4 // indirect
