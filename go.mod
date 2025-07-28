@@ -13,7 +13,7 @@ exclude (
 
 require (
 	github.com/bborbe/errors v1.3.0
-	github.com/bborbe/kv v1.14.1
+	github.com/bborbe/kv v1.14.2
 	github.com/bborbe/sentry v1.8.0
 	github.com/bborbe/service v1.6.2
 	github.com/golang/glog v1.2.5
