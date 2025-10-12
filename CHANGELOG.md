@@ -8,6 +8,15 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.10.5
+
+- add golangci-lint configuration
+- add tools.go for Go tool dependency tracking
+- update GitHub workflow with Go 1.25.2 and Trivy installation
+- enhance Makefile with additional security checks (osv-scanner, gosec, trivy)
+- apply code formatting with golines (100 char line length)
+- go mod update
+
 ## v1.10.4
 
 - improve README with usage example and installation instructions

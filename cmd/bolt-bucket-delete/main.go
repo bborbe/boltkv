@@ -23,10 +23,10 @@ func main() {
 }
 
 type application struct {
-	SentryDSN   string `required:"false" arg:"sentry-dsn" env:"SENTRY_DSN" usage:"SentryDSN" display:"length"`
+	SentryDSN   string `required:"false" arg:"sentry-dsn"   env:"SENTRY_DSN"   usage:"SentryDSN"      display:"length"`
 	SentryProxy string `required:"false" arg:"sentry-proxy" env:"SENTRY_PROXY" usage:"Sentry Proxy"`
-	DataDir     string `required:"true" arg:"datadir" env:"DATADIR" usage:"data directory"`
-	Bucket      string `required:"true" arg:"bucket" env:"BUCKET" usage:"bucket name"`
+	DataDir     string `required:"true"  arg:"datadir"      env:"DATADIR"      usage:"data directory"`
+	Bucket      string `required:"true"  arg:"bucket"       env:"BUCKET"       usage:"bucket name"`
 }
 
 func (a *application) Run(ctx context.Context, sentryClient libsentry.Client) error {

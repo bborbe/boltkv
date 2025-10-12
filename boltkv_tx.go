@@ -72,7 +72,12 @@ func (t *tx) CreateBucket(ctx context.Context, name libkv.BucketName) (libkv.Buc
 	boltBucket, err := t.boltTx.CreateBucket(name)
 	if err != nil {
 		if errors.Is(err, bolt.ErrBucketExists) {
-			return nil, errors.Wrapf(ctx, libkv.BucketAlreadyExistsError, "bucket already exists: %v", err)
+			return nil, errors.Wrapf(
+				ctx,
+				libkv.BucketAlreadyExistsError,
+				"bucket already exists: %v",
+				err,
+			)
 		}
 		return nil, errors.Wrapf(ctx, err, "create bucket failed")
 	}
@@ -81,7 +86,10 @@ func (t *tx) CreateBucket(ctx context.Context, name libkv.BucketName) (libkv.Buc
 	return bucket, nil
 }
 
-func (t *tx) CreateBucketIfNotExists(ctx context.Context, name libkv.BucketName) (libkv.Bucket, error) {
+func (t *tx) CreateBucketIfNotExists(
+	ctx context.Context,
+	name libkv.BucketName,
+) (libkv.Bucket, error) {
 	t.mux.Lock()
 	defer t.mux.Unlock()
 

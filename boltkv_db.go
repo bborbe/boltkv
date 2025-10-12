@@ -83,7 +83,10 @@ func (b *boltdb) Close() error {
 	return b.db.Close()
 }
 
-func (b *boltdb) Update(ctx context.Context, fn func(ctx context.Context, tx libkv.Tx) error) error {
+func (b *boltdb) Update(
+	ctx context.Context,
+	fn func(ctx context.Context, tx libkv.Tx) error,
+) error {
 	glog.V(4).Infof("db update started")
 	if IsTransactionOpen(ctx) {
 		return errors.Wrapf(ctx, libkv.TransactionAlreadyOpenError, "transaction already open")
