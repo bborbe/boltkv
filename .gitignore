@@ -3,3 +3,5 @@
 /.claude
 /coverage.out
 /coverage.html
+/.update-logs/
+/.mcp-*

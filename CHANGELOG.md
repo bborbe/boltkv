@@ -8,6 +8,13 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.11.2
+
+- Update Go from 1.25.5 to 1.25.7
+- Update dependencies (ginkgo, gomega, osv-scanner, sentry-go, and others)
+- Update CI workflow to use Go 1.25.7
+- Add .update-logs/ and .mcp-* to .gitignore
+
 ## v1.11.1
 
 - Update Go to 1.25.5
