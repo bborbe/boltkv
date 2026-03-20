@@ -5,3 +5,6 @@
 /coverage.html
 /.update-logs/
 /.mcp-*
+/.dark-factory.lock
+/prompts/log
+/specs/log
