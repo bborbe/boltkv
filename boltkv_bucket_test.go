@@ -37,7 +37,7 @@ var _ = Describe("Bucket", func() {
 				bucket, err := tx.CreateBucket(ctx, bucketName)
 				Expect(err).To(BeNil())
 
-				boltBucket := bucket.(boltkv.Bucket)
+				boltBucket := bucket.(boltkv.Bucket) //nolint:forcetypeassert
 				Expect(boltBucket.Bucket()).ToNot(BeNil())
 
 				return nil

@@ -34,7 +34,7 @@ var _ = Describe("Tx", func() {
 	Context("BoltDB-specific methods", func() {
 		It("provides access to underlying BoltDB transaction", func() {
 			err := db.Update(ctx, func(ctx context.Context, tx libkv.Tx) error {
-				boltTx := tx.(boltkv.Tx)
+				boltTx := tx.(boltkv.Tx) //nolint:forcetypeassert
 				Expect(boltTx.Tx()).ToNot(BeNil())
 				return nil
 			})

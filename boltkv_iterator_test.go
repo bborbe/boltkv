@@ -38,7 +38,7 @@ var _ = Describe("Iterator", func() {
 				Expect(err).To(BeNil())
 
 				iterator := bucket.Iterator()
-				boltIterator := iterator.(boltkv.Iterator)
+				boltIterator := iterator.(boltkv.Iterator) //nolint:forcetypeassert
 				Expect(boltIterator.Cursor()).ToNot(BeNil())
 
 				return nil
