@@ -8,6 +8,14 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.12.1
+
+- Update direct dependencies: errors, kv, sentry, service
+- Update golangci-lint to v2.11.4 and osv-scanner to v2.3.5
+- Add OSV scanner and Trivy ignore files for docker/docker indirect CVEs
+- Update numerous indirect dependencies across the board
+- Clean up go.mod: remove exclude blocks and unused indirect deps
+
 ## v1.12.0
 
 - feat: enable golangci-lint in check target with updated linters and fix all violations
