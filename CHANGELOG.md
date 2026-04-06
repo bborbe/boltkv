@@ -8,6 +8,13 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.12.3
+
+- update bborbe/* dependencies (errors, kv, sentry, service)
+- update indirect deps (containerd, docker/cli, go-git, moby/buildkit)
+- add vulnerability suppressions for GO-2026-4923/CVE-2026-33817
+- improve vulncheck Makefile target with JSON filtering
+
 ## v1.12.2
 
 - Update go-git/go-git to v5.17.1 (fix security vulnerabilities)
