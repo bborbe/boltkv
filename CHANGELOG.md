@@ -8,6 +8,13 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.12.4
+
+- bump Go toolchain to 1.26.2
+- extend vulncheck ignore list with GO-2026-4514, GO-2022-0470, GO-2026-4772, GO-2026-4771
+- add OSV/Trivy ignore entries for bbolt and aws-sdk-go-v2 vulns
+- improve vulncheck output on failure
+
 ## v1.12.3
 
 - update bborbe/* dependencies (errors, kv, sentry, service)
