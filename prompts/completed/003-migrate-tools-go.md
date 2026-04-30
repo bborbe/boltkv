@@ -1,11 +1,12 @@
 ---
-status: committing
+status: completed
 summary: Migrated from tools.go to tools.env + Makefile @version pattern; go.mod reduced from 454 to 48 lines, replace block removed, docker/aws CVE suppressions cleaned up, errcheck Go 1.26.2 gotypesalias compatibility fixed.
 container: boltkv-003-migrate-tools-go
 dark-factory-version: dev
 created: "2026-04-30T21:23:48Z"
 queued: "2026-04-30T21:23:48Z"
 started: "2026-04-30T21:23:49Z"
+completed: "2026-04-30T21:38:15Z"
 ---
 
 # Migrate from tools.go to tools.env + Makefile @version pattern
