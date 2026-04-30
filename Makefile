@@ -8,7 +8,7 @@ precommit: ensure format generate test check addlicense
 
 .PHONY: ensure
 ensure:
-	go mod tidy
+	go mod tidy -e
 	go mod verify
 	rm -rf vendor
 
