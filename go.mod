@@ -1,11 +1,11 @@
 module github.com/bborbe/boltkv
 
-go 1.26.2
+go 1.26.3
 
 require (
-	github.com/bborbe/errors v1.5.11
-	github.com/bborbe/kv v1.19.6
-	github.com/bborbe/sentry v1.9.16
+	github.com/bborbe/errors v1.5.13
+	github.com/bborbe/kv v1.19.7
+	github.com/bborbe/sentry v1.9.17
 	github.com/bborbe/service v1.9.10
 	github.com/golang/glog v1.2.5
 	github.com/onsi/ginkgo/v2 v2.28.3
@@ -19,12 +19,12 @@ require (
 	github.com/bborbe/collection v1.20.11 // indirect
 	github.com/bborbe/math v1.3.9 // indirect
 	github.com/bborbe/parse v1.10.11 // indirect
-	github.com/bborbe/run v1.9.23 // indirect
+	github.com/bborbe/run v1.9.24 // indirect
 	github.com/bborbe/time v1.25.10 // indirect
 	github.com/bborbe/validation v1.4.12 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/getsentry/sentry-go v0.46.1 // indirect
+	github.com/getsentry/sentry-go v0.46.2 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
