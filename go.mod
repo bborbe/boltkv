@@ -4,7 +4,7 @@ go 1.26.3
 
 require (
 	github.com/bborbe/errors v1.5.13
-	github.com/bborbe/kv v1.20.0
+	github.com/bborbe/kv v1.21.1
 	github.com/bborbe/sentry v1.9.17
 	github.com/bborbe/service v1.9.10
 	github.com/golang/glog v1.2.5

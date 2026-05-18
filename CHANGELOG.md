@@ -8,6 +8,13 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.14.0
+
+- **BREAKING**: `Stats(ctx)` now returns `*libkv.Stats` instead of `libkv.Stats` (matches bborbe/kv v1.21.0 interface)
+- Fast `Stats(ctx)` now lists bucket NAMES only (no `Bucket.Stats()` walk) — O(top-level buckets)
+- Implement `StatsDetailed(ctx) (*libkv.Stats, error)` — full `Bucket.Stats()` walk per bucket; O(pages)
+- Bump bborbe/kv v1.20.0 → v1.21.1
+
 ## v1.13.0
 
 - implement `Stats(ctx) (Stats, error)` to satisfy bborbe/kv v1.20.0 `DB` interface; uses bbolt `Bucket.Stats()` for O(1) per-bucket key counts + size, and `os.Stat` for total file size
