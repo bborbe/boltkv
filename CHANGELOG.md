@@ -8,6 +8,13 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.13.0
+
+- implement `Stats(ctx) (Stats, error)` to satisfy bborbe/kv v1.20.0 `DB` interface; uses bbolt `Bucket.Stats()` for O(1) per-bucket key counts + size, and `os.Stat` for total file size
+- bump bborbe/kv v1.19.7 → v1.20.0
+- bump bborbe/time v1.25.10 → v1.27.0, bborbe/parse v1.10.11 → v1.10.12, bborbe/validation v1.4.12 → v1.4.13
+- bump ginkgo v2.28.3 → v2.29.0, gomega v1.40.0 → v1.41.0
+
 ## v1.12.6
 
 - bump go 1.26.2 → 1.26.3
