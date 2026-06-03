@@ -8,6 +8,14 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.14.1
+
+- bump go 1.26.3 → 1.26.4
+- bump bborbe/service v1.9.10 → v1.10.1, bborbe/sentry v1.9.17 → v1.9.18
+- bump prometheus/common, prometheus/procfs, golang.org/x/{net,sys,text,tools,mod}
+- drop standalone errcheck + gosec targets; inline into golangci-lint config
+- add .maintainer.yaml for autoRelease + autoApprove; flip .dark-factory.yaml autoRelease=false
+
 ## v1.14.0
 
 - **BREAKING**: `Stats(ctx)` now returns `*libkv.Stats` instead of `libkv.Stats` (matches bborbe/kv v1.21.0 interface)
