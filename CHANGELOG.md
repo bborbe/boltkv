@@ -8,6 +8,13 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.14.2
+
+- Bump go.etcd.io/bbolt from v1.4.3 to v1.5.0
+- Bump github.com/bborbe/kv from v1.21.1 to v1.21.2
+- Bump test dependencies (ginkgo v2.29.0 → v2.32.0, gomega v1.41.0 → v1.42.1)
+- Bump indirect dependencies (x/net, x/sync, x/sys, x/text)
+
 ## v1.14.1
 
 - bump go 1.26.3 → 1.26.4
