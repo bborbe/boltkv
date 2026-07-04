@@ -3,10 +3,10 @@ module github.com/bborbe/boltkv
 go 1.26.4
 
 require (
-	github.com/bborbe/errors v1.5.13
-	github.com/bborbe/kv v1.21.2
-	github.com/bborbe/sentry v1.9.18
-	github.com/bborbe/service v1.10.1
+	github.com/bborbe/errors v1.5.15
+	github.com/bborbe/kv v1.21.4
+	github.com/bborbe/sentry v1.9.20
+	github.com/bborbe/service v1.10.3
 	github.com/golang/glog v1.2.5
 	github.com/onsi/ginkgo/v2 v2.32.0
 	github.com/onsi/gomega v1.42.1
@@ -15,16 +15,16 @@ require (
 
 require (
 	github.com/Masterminds/semver/v3 v3.5.0 // indirect
-	github.com/bborbe/argument/v2 v2.12.27 // indirect
+	github.com/bborbe/argument/v2 v2.12.29 // indirect
 	github.com/bborbe/collection v1.20.12 // indirect
-	github.com/bborbe/math v1.3.10 // indirect
+	github.com/bborbe/math v1.3.11 // indirect
 	github.com/bborbe/parse v1.10.12 // indirect
-	github.com/bborbe/run v1.9.28 // indirect
-	github.com/bborbe/time v1.27.0 // indirect
+	github.com/bborbe/run v1.9.29 // indirect
+	github.com/bborbe/time v1.27.1 // indirect
 	github.com/bborbe/validation v1.4.13 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/getsentry/sentry-go v0.46.2 // indirect
+	github.com/getsentry/sentry-go v0.47.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect

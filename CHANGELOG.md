@@ -8,6 +8,12 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v1.14.3
+
+- bump github.com/bborbe/errors, kv, sentry, service
+- bump github.com/bborbe/argument, math, run, time (indirect)
+- bump github.com/getsentry/sentry-go v0.47.0
+
 ## v1.14.2
 
 - Bump go.etcd.io/bbolt from v1.4.3 to v1.5.0
