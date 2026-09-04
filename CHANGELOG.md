@@ -8,6 +8,10 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## Unreleased
+
+- chore: update github.com/bborbe/kv to v1.21.13, github.com/bborbe/sentry to v1.10.1, github.com/bborbe/service to v1.10.11
+
 ## v1.15.2
 
 - chore: update go module dependencies
