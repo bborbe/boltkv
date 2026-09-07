@@ -4,7 +4,7 @@ go 1.27.1
 
 require (
 	github.com/bborbe/errors v1.6.1
-	github.com/bborbe/kv v1.21.13
+	github.com/bborbe/kv v1.21.14
 	github.com/bborbe/sentry v1.10.1
 	github.com/bborbe/service v1.10.13
 	github.com/golang/glog v1.2.5
@@ -18,7 +18,7 @@ require (
 	github.com/bborbe/argument/v2 v2.13.2 // indirect
 	github.com/bborbe/collection v1.20.26 // indirect
 	github.com/bborbe/math v1.4.8 // indirect
-	github.com/bborbe/parse v1.11.3 // indirect
+	github.com/bborbe/parse v1.11.4 // indirect
 	github.com/bborbe/run v1.10.2 // indirect
 	github.com/bborbe/time v1.27.14 // indirect
 	github.com/bborbe/validation v1.5.0 // indirect
