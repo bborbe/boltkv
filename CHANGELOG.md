@@ -8,7 +8,7 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
-## Unreleased
+## v1.16.0
 
 - feat: add Compact and CompactResult to reclaim disk space by rewriting a BoltDB file
 - chore: enable dark-factory autoGeneratePrompts and set GOFLAGS=-buildvcs=false for the masked-.git worktree flow
