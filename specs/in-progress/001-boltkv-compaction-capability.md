@@ -1,6 +1,9 @@
 ---
-status: draft
-created: 2026-10-05
+status: prompted
+approved: "2026-10-05T11:10:06Z"
+generating: "2026-10-05T11:10:15Z"
+prompted: "2026-10-05T11:18:19Z"
+branch: dark-factory/boltkv-compaction-capability
 ---
 
 # Reusable BoltDB Compaction Capability
@@ -33,7 +36,7 @@ Every BoltDB-backed trading service can grow without bound and has no way to giv
 - [ ] Package `boltkv` exports `Compact` with the frozen signature and `CompactResult` with its three `int64` fields — evidence: `go doc . Compact` prints `func Compact(ctx context.Context, path string) (*CompactResult, error)`, and `go doc . CompactResult` prints `SizeBefore`, `SizeAfter` and `BytesReclaimed`.
 - [ ] The `Compact` doc comment states the exclusive-access requirement — evidence: `go doc . Compact` output contains a sentence naming that no other handle or process may hold the database open while the call runs.
 - [ ] Compacting a database with freed pages shrinks the file and reports the reclaim — evidence: a Ginkgo test writes **at least 10,000 keys with ~1 KiB values** into a temporary database — enough that the surviving data occupies fewer pages than the original, so the shrink is real rather than page-granular noise — deletes **at least 90 %** of them, records the size via `os.Stat`, calls `Compact`, and asserts `SizeAfter < SizeBefore`, `BytesReclaimed > 0`, and `BytesReclaimed == SizeBefore - SizeAfter`.
-- [ ] The compacted file holds exactly the surviving keys — evidence: the same test reopens the compacted file and asserts every surviving key reads back with its original value, and that a key deleted before the call returns `nil` (negative assertion).
+- [ ] The compacted file holds exactly the surviving keys — evidence: the same test reopens the compacted file and asserts every surviving key reads back with its original value, and that a key deleted before the call reports `Exists() == false` on the `Item` returned by `bucket.Get` (negative assertion — `libkv`'s `Get` returns `(Item, error)` and never a nil `Item` for a missing key; `Exists()` is `len(value) > 0`, verified at `kv_item.go:32` in `github.com/bborbe/kv@v1.21.14`).
 - [ ] A database held open by another handle produces a bounded error, not a hang and not a corrupt file — evidence: a test opens the database through `boltkv.OpenFile` and keeps that handle, calls `Compact` on the same path, and asserts the call returns a non-nil error, that `os.Stat` reports the same size as before the call, and that the still-open handle reads its surviving keys.
 - [ ] The package stays HTTP-free — evidence: `go list -f '{{join .Imports "\n"}}' . | grep -c 'net/http'` prints `0`.
 - [ ] The change is additive — evidence: `go doc -all .` lists the new `Compact` and `CompactResult`, every pre-existing exported declaration is unchanged, and `make precommit` exits 0.
@@ -90,7 +93,7 @@ Every BoltDB-backed trading service can grow without bound and has no way to giv
 | Another process or handle holds the database open | `Compact` returns an error naming the path within the bounded lock timeout; the file is unchanged | Close the holder, then call `Compact` again |
 | The temporary file cannot be written (no space, permissions) | `Compact` returns an error; the original file is untouched and no partial file replaces it | Free space or fix permissions, then call again |
 | The process is killed after the temporary file is written and before the rename | The original database is intact; a stray temporary file is left beside it | Delete the stray temporary file; the database is unchanged |
-| The database has no freed pages | `Compact` succeeds and reports `BytesReclaimed == 0`; the file is unchanged | None — a zero reclaim is a valid outcome, not a failure |
+| The database has no freed pages | `Compact` still succeeds; the reclaim is whatever the repack yields and is not required to be zero — bbolt's `Compact` writes with `FillPercent = 1.0` (`compact.go:61` in `go.etcd.io/bbolt@v1.5.0`), so it can pack tighter than the source and shrink the file even with no freed pages | None — any reclaim is a valid outcome, not a failure |
 | The path does not exist, or is not a BoltDB file | `Compact` returns an error naming the path; nothing is created at that path | Pass a path to an existing BoltDB file |
 
 ## Security / Abuse

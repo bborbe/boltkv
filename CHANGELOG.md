@@ -10,6 +10,7 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+- feat: add Compact and CompactResult to reclaim disk space by rewriting a BoltDB file
 - chore: enable dark-factory autoGeneratePrompts and set GOFLAGS=-buildvcs=false for the masked-.git worktree flow
 
 ## v1.15.5
