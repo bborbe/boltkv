@@ -1,9 +1,10 @@
 ---
-status: verifying
+status: completed
 approved: "2026-10-05T11:10:06Z"
 generating: "2026-10-05T11:10:15Z"
 prompted: "2026-10-05T11:18:19Z"
 verifying: "2026-10-05T11:45:56Z"
+completed: "2026-10-05T11:52:00Z"
 branch: dark-factory/boltkv-compaction-capability
 ---
 
