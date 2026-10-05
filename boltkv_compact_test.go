@@ -272,4 +272,99 @@ var _ = Describe("Compact", func() {
 		Expect(result.SizeBefore).To(Equal(sizeBefore))
 		Expect(result.BytesReclaimed).To(Equal(result.SizeBefore - result.SizeAfter))
 	})
+
+	It("preserves every key and value across multiple buckets", func() {
+		db, err := boltkv.OpenTemp(ctx)
+		Expect(err).To(BeNil())
+		path := db.DB().Path()
+		DeferCleanup(func() {
+			_ = os.Remove(path)
+		})
+
+		expected := map[string]map[string][]byte{
+			"alpha": {},
+			"beta":  {},
+			"gamma": {},
+		}
+		for i := 0; i < 500; i++ {
+			expected["alpha"][fmt.Sprintf("key-%06d", i)] = bytes.Repeat([]byte("a"), 256)
+		}
+		for i := 0; i < 200; i++ {
+			expected["beta"][fmt.Sprintf("key-%06d", i)] = bytes.Repeat([]byte("b"), 2048)
+		}
+		expected["gamma"]["key-000000"] = bytes.Repeat([]byte("g"), 4096)
+
+		err = db.Update(ctx, func(ctx context.Context, tx libkv.Tx) error {
+			for bucketName, entries := range expected {
+				bucket, err := tx.CreateBucketIfNotExists(ctx, libkv.NewBucketName(bucketName))
+				if err != nil {
+					return err
+				}
+				for key, value := range entries {
+					if err := bucket.Put(ctx, []byte(key), value); err != nil {
+						return err
+					}
+				}
+			}
+			return nil
+		})
+		Expect(err).To(BeNil())
+		Expect(db.Close()).To(Succeed())
+
+		beforeInfo, err := os.Stat(path)
+		Expect(err).To(BeNil())
+
+		result, err := boltkv.Compact(ctx, path)
+		Expect(err).To(BeNil())
+		Expect(result).NotTo(BeNil())
+
+		afterInfo, err := os.Stat(path)
+		Expect(err).To(BeNil())
+
+		Expect(result.SizeBefore).To(Equal(beforeInfo.Size()))
+		Expect(result.SizeAfter).To(Equal(afterInfo.Size()))
+		Expect(result.BytesReclaimed).To(Equal(result.SizeBefore - result.SizeAfter))
+
+		reopened, err := boltkv.OpenFile(ctx, path)
+		Expect(err).To(BeNil())
+		DeferCleanup(func() {
+			_ = reopened.Close()
+		})
+
+		err = reopened.View(ctx, func(ctx context.Context, tx libkv.Tx) error {
+			names, err := tx.ListBucketNames(ctx)
+			Expect(err).To(BeNil())
+			Expect(names).To(HaveLen(len(expected)))
+
+			for bucketName, entries := range expected {
+				bucket, err := tx.Bucket(ctx, libkv.NewBucketName(bucketName))
+				Expect(err).To(BeNil())
+				Expect(countKeys(bucket)).To(Equal(len(entries)))
+
+				for key, want := range entries {
+					item, err := bucket.Get(ctx, []byte(key))
+					Expect(err).To(BeNil())
+					Expect(item.Exists()).To(BeTrue())
+					Expect(item.Value(func(val []byte) error {
+						Expect(val).To(Equal(want))
+						return nil
+					})).To(BeNil())
+				}
+			}
+			return nil
+		})
+		Expect(err).To(BeNil())
+	})
 })
+
+// countKeys returns the number of keys in bucket, used to prove that
+// compaction neither drops nor invents keys.
+func countKeys(bucket libkv.Bucket) int {
+	it := bucket.Iterator()
+	defer it.Close()
+	count := 0
+	for it.Rewind(); it.Valid(); it.Next() {
+		count++
+	}
+	return count
+}
