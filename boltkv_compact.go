@@ -17,6 +17,29 @@ import (
 // compactLockTimeout bounds how long Compact waits for the exclusive file lock.
 const compactLockTimeout = time.Second
 
+// compactTxMaxSize bounds the size, in bytes of key and value data, that
+// Compact accumulates into a single destination transaction before bbolt
+// commits and starts a new one.
+//
+// The trade-off runs in both directions. A larger bound means fewer commits
+// and therefore fewer fsyncs (faster), but more dirty pages held in memory at
+// once. A smaller bound means more commits (each with its own fsync) but a
+// smaller, predictable memory ceiling.
+//
+// The value is chosen against a container memory limit far below the size of
+// the database being compacted: bbolt keeps every dirty page of the current
+// destination transaction in memory, so a transaction's heap footprint is
+// roughly its key-and-value bytes times a small constant (page rounding at
+// FillPercent 1.0 plus the dirty-page map). At 8 MiB the peak heap held by
+// compaction is on the order of 10 MiB, which leaves more than four times the
+// headroom under a 50 Mi container limit for the Go runtime, the retention
+// pass that runs before compaction, and the rest of the process. The source
+// database is memory-mapped and so does not contribute to the heap. A 29 GiB
+// database therefore needs on the order of 3,700 commits, each an fsync —
+// acceptable for a maintenance operation, and vastly better than being
+// OOM-killed.
+const compactTxMaxSize int64 = 8 * 1024 * 1024
+
 // CompactResult reports the database file size before and after compaction.
 type CompactResult struct {
 	SizeBefore     int64
@@ -66,7 +89,7 @@ func Compact(ctx context.Context, path string) (*CompactResult, error) {
 		_ = src.Close()
 		return nil, errors.Wrapf(ctx, err, "open temp db %s failed", tempPath)
 	}
-	if err := bolt.Compact(dst, src, 0); err != nil {
+	if err := bolt.Compact(dst, src, compactTxMaxSize); err != nil {
 		_ = dst.Close()
 		_ = src.Close()
 		return nil, errors.Wrapf(ctx, err, "compact %s failed", path)
