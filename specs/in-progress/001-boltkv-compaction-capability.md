@@ -1,8 +1,9 @@
 ---
-status: prompted
+status: verifying
 approved: "2026-10-05T11:10:06Z"
 generating: "2026-10-05T11:10:15Z"
 prompted: "2026-10-05T11:18:19Z"
+verifying: "2026-10-05T11:45:56Z"
 branch: dark-factory/boltkv-compaction-capability
 ---
 
@@ -115,3 +116,18 @@ Rationale: the change is one function, one result type and its tests — a singl
 ## Do-Nothing Option
 
 The ecosystem keeps a delete path that cannot reduce disk usage. Retention and reset ship as levers that free pages nothing can reclaim, so the 26.97 GiB `core-tick-candle-converter-0/bolt.db` and its 11–12 GiB siblings keep only growing — and the disk alerts that retention was supposed to prevent keep firing.
+
+## Verification Result
+
+**Verified:** 2026-10-05T11:51:30Z (HEAD ddfcfa0)
+**Binary:** /opt/homebrew/bin/dark-factory v0.196.0 (lifecycle); go1.27.1 darwin/arm64 (build/test)
+**Scenario:** no scenario file — dark-factory default for a library spec; walked the container-executable rung + all 7 ACs, plus a standalone harness exercising `boltkv.Compact` on real on-disk BoltDB files
+**Evidence:**
+- `go doc . Compact` → `func Compact(ctx context.Context, path string) (*CompactResult, error)` + the exclusivity sentence; `go doc . CompactResult` → `SizeBefore`/`SizeAfter`/`BytesReclaimed`
+- `go list -f '{{join .Imports "\n"}}' . | grep -c 'net/http'` → `0`
+- 6/6 Ginkgo `Compact` specs pass; `make precommit` exit 0 (coverage 84.9%, golangci-lint "No issues found", osv-scanner + trivy clean)
+- Harness: 20000 keys × 1 KiB, 19000 deleted → `ls -l` 63,848,448 → 2,097,152 bytes; `BytesReclaimed=61,751,296 == before-after`; survivor key-019999 read back 1024 B equal, deleted key absent, 1000 survivors
+- Harness: held-handle `Compact` returned in 966 ms with an error naming the path, size unchanged (131072), open handle still read `survivor="value"`
+- `.go` diff vs pre-feature tree purely additive (95 + 275 insertions, 0 deletions)
+**Deferred:** operator-executable rung (compact a real trading-dev `bolt.db`) not run — needs dev-cluster volume access; owned by the consuming task's demonstration step. No AC depends on it.
+**Verdict:** PASS
