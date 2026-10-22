@@ -8,6 +8,10 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## Unreleased
+
+- chore: update go module dependencies
+
 ## v1.16.3
 
 - chore: update Go to 1.27.3 and github.com/bborbe/errors to v1.6.4, github.com/bborbe/kv to v1.21.19, github.com/bborbe/sentry to v1.10.6, github.com/bborbe/service to v1.11.1, github.com/onsi/ginkgo/v2 to v2.33.1, github.com/onsi/gomega to v1.44.0
